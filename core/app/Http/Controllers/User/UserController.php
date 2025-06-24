@@ -77,6 +77,7 @@ class UserController extends Controller
             'area_name'   => 'required|string|max:255',
             'postcode'    => 'required|string|max:20',
         ]);
+        // dd(request()->all());
 
         $user->country_code = $request->country_code;
         $user->mobile       = $request->mobile;

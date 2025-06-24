@@ -48,7 +48,11 @@ class RegisterController extends Controller
             'email' => 'required|string|email|unique:users',
             'password' => ['required', 'confirmed', $passwordValidation],
             'captcha' => 'sometimes|required',
-            'agree' => $agree
+            'agree' => $agree,
+            'division_id'  => 'required|integer',
+            'district_id'  => 'required|integer',
+            'area_name'    => 'required|string|max:255',
+            'postcode'     => 'required|string|max:20',
         ], [
             'firstname.required' => 'The first name field is required',
             'lastname.required' => 'The last name field is required'
@@ -63,26 +67,27 @@ class RegisterController extends Controller
             $notify[] = ['error', 'Registration not allowed'];
             return back()->withNotify($notify);
         }
-    
+
         $request->merge(['username' => $request->email]);
         $this->validator($request->all())->validate();
-    
+
         $request->session()->regenerateToken();
-    
+
         if (!verifyCaptcha()) {
             $notify[] = ['error', 'Invalid captcha provided'];
             return back()->withNotify($notify);
         }
-    
+
         event(new Registered($user = $this->create($request->all())));
         $this->guard()->login($user);
-    
+
         return $this->registered($request, $user)
             ?: redirect($this->redirectPath());
     }
 
     protected function create(array $data)
     {
+        // dd($data);
         $user = new User();
         $user->email = strtolower($data['email']);
         $user->username = strtolower($data['email']);
@@ -91,6 +96,13 @@ class RegisterController extends Controller
         $user->password = Hash::make($data['password']);
         $user->ev = gs('ev') ? Status::NO : Status::YES;
         $user->sv = gs('sv') ? Status::NO : Status::YES;
+
+        $user->division_id = $data['division_id'] ?? null;
+        $user->district_id = $data['district_id'] ?? null;
+        $user->area_name   = $data['area_name'] ?? null;
+        $user->postcode    = $data['postcode'] ?? null;
+
+
         $user->save();
 
         $adminNotification = new AdminNotification();
@@ -159,7 +171,7 @@ class RegisterController extends Controller
         // Merge guest cart with user cart
         $cartManager = new CartManager();
         // $cartManager->mergeGuestCart();
-        
+
         return to_route('user.home');
     }
 }
