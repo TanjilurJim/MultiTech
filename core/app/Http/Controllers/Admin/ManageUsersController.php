@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Rules\FileTypeValidate;
+// use App\Http\Helpers\LocationHelper;
 
 class ManageUsersController extends Controller
 {
@@ -21,21 +22,40 @@ class ManageUsersController extends Controller
     {
         $pageTitle = 'All Customers';
         $users = $this->userData();
-        return view('admin.users.list', compact('pageTitle', 'users'));
+
+        $locationData = getBangladeshLocationData();
+        $divisions = collect($locationData['divisions'])->pluck('name', 'id')->toArray();
+        $districts = collect($locationData['districts'])->pluck('name', 'id')->toArray();
+        $bdData = $locationData;
+
+        return view('admin.users.list', compact('pageTitle', 'users', 'divisions', 'districts', 'bdData'));
     }
+
+
+
+
 
     public function activeUsers()
     {
         $pageTitle = 'Active Customers';
         $users = $this->userData('active');
-        return view('admin.users.list', compact('pageTitle', 'users'));
+        $locationData = getBangladeshLocationData();
+        $divisions = collect($locationData['divisions'])->pluck('name', 'id')->toArray();
+        $districts = collect($locationData['districts'])->pluck('name', 'id')->toArray();
+        $bdData = $locationData;
+        return view('admin.users.list', compact('pageTitle', 'users', 'divisions', 'districts', 'bdData'));
     }
 
     public function bannedUsers()
     {
         $pageTitle = 'Banned Customers';
         $users = $this->userData('banned');
-        return view('admin.users.list', compact('pageTitle', 'users'));
+
+        $locationData = getBangladeshLocationData();
+        $divisions = collect($locationData['divisions'])->pluck('name', 'id')->toArray();
+        $districts = collect($locationData['districts'])->pluck('name', 'id')->toArray();
+        $bdData = $locationData;
+        return view('admin.users.list', compact('pageTitle', 'users', 'divisions', 'districts', 'bdData'));
     }
 
     public function emailUnverifiedUsers()
@@ -83,6 +103,21 @@ class ManageUsersController extends Controller
             $users = User::query();
         }
 
+        // 🔍 Add location filters
+        if (request()->filled('division_id')) {
+            $users->where('division_id', request()->division_id);
+        }
+
+        if (request()->filled('district_id')) {
+            $users->where('district_id', request()->district_id);
+        }
+
+        if (request()->filled('area_name')) {
+            $users->where('area_name', request()->area_name);
+        }
+
+        // 🔍 Existing filters
+
         return $users->withCount('orders')->withSum('orders', 'subtotal')->searchable(['username', 'email'])->orderBy('id', 'desc')->paginate(getPaginate());
     }
 
@@ -112,9 +147,10 @@ class ManageUsersController extends Controller
         $widget['openedTickets']      = SupportTicket::where('user_id', $user->id)->where('status', Status::TICKET_OPEN)->count();
         $widget['closedTickets']      = SupportTicket::where('user_id', $user->id)->where('status', Status::TICKET_CLOSE)->count();
         $widget['answeredTickets']    = SupportTicket::where('user_id', $user->id)->where('status', Status::TICKET_ANSWER)->count();
+        $bdData = getBangladeshLocationData();
 
         $countries          = getCountries();
-        return view('admin.users.detail', compact('pageTitle', 'user', 'countries', 'widget'));
+        return view('admin.users.detail', compact('pageTitle', 'user', 'countries', 'widget', 'bdData'));
     }
 
     public function update(Request $request, $id)
@@ -134,6 +170,10 @@ class ManageUsersController extends Controller
             'email'     => 'required|email|string|max:40|unique:users,email,' . $user->id,
             'mobile'    => 'required|string|max:40',
             'country'   => 'required|in:' . $countries,
+            'division_id' => 'required|integer',
+            'district_id' => 'required|integer',
+            'area_name'   => 'required|string|max:255',
+            'postcode'    => 'required|string|max:20',
         ]);
 
         $exists = User::where('mobile', $request->mobile)->where('dial_code', $dialCode)->where('id', '!=', $user->id)->exists();
@@ -146,6 +186,11 @@ class ManageUsersController extends Controller
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->email = $request->email;
+
+        $user->division_id = $request->division_id;
+        $user->district_id = $request->district_id;
+        $user->area_name   = $request->area_name;
+        $user->postcode    = $request->postcode;
 
         $user->address = $request->address;
         $user->city = $request->city;
