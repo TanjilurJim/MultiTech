@@ -13,7 +13,8 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function home() {
+    public function home()
+    {
         $pageTitle = 'Dashboard';
         $user = auth()->user();
         $orders    = Order::isValidOrder()->with('orderDetail', 'appliedCoupon')->where('user_id', $user->id);
@@ -71,6 +72,10 @@ class UserController extends Controller
             'mobile_code'  => 'required|in:' . $mobileCodes,
             'username'     => 'required|unique:users',
             'mobile'       => ['required', 'regex:/^([0-9]*)$/', Rule::unique('users')->where('dial_code', $request->mobile_code)],
+            'division_id' => 'required|integer',
+            'district_id' => 'required|integer',
+            'area_name'   => 'required|string|max:255',
+            'postcode'    => 'required|string|max:20',
         ]);
 
         $user->country_code = $request->country_code;
@@ -82,6 +87,10 @@ class UserController extends Controller
         $user->zip          = $request->zip;
         $user->country_name = @$request->country;
         $user->dial_code    = $request->mobile_code;
+        $user->division_id = $request->division_id;
+        $user->district_id = $request->district_id;
+        $user->area_name   = $request->area_name;
+        $user->postcode    = $request->postcode;
 
         $user->profile_complete = Status::YES;
         $user->save();
