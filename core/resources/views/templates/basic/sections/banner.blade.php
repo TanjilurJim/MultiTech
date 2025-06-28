@@ -10,7 +10,7 @@
 
         <div class="hero-slider">
             @include('Template::partials.banner_sliders')
-            @include('Template::partials.banner_categories', ['fixedBanner' => $content->data_values?->fixed_banner])
+            <!-- @include('Template::partials.banner_categories', ['fixedBanner' => $content->data_values?->fixed_banner]) -->
         </div>
 
         @if (gs('homepage_layout') == 'sidebar_menu' && @$content->data_values->fixed_banner)

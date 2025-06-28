@@ -1,3 +1,4 @@
+
 @php
     $topCategories = \App\Models\Category::featured()->orderBy('id', 'desc')->get();
     $content = getContent('featured_categories.content', true);
@@ -5,7 +6,7 @@
 
 <section class="my-60">
     <div class="container">
-        @if (!blank($topCategories))
+        <!-- @if (!blank($topCategories))
             <div class="section-header">
                 <h5 class="title">{{ __(@$content->data_values->title) }}</h5>
             </div>
@@ -17,6 +18,10 @@
                     </div>
                 @endforeach
             </div>
-        @endif
+        @endif -->
+        @include('Template::partials.banner_categories', [
+            'fixedBanner' => $content->data_values->fixed_banner ?? null
+        ])
     </div>
+    
 </section>

@@ -4,7 +4,16 @@
 
 <div class="card mb-4">
     <div class="card-body">
-        <div class="select2-parent d-flex flex-wrap">
+        <!-- Specify Field (New) -->
+        <div class="form-group row">
+            <div class="col-md-3">
+                <label>@lang('Specify')</label>
+            </div>
+            <div class="col-md-9">
+                <textarea rows="5" class="form-control" name="specify">{{ $product->specify ?? '' }}</textarea>
+            </div>
+        </div>
+        <!-- <div class="select2-parent d-flex flex-wrap">
             <label class="required">@lang('Product Type')</label>
             <select class="form-control w-auto flex-grow-1" name="product_type_id">
                 <option value="">@lang('Select One')</option>
@@ -12,7 +21,7 @@
                     <option value="{{ @$productType->id }}" data-specifications='@json($productType->specifications)' @selected($productType->id == @$product->product_type_id)>{{ __($productType->name) }}</option>
                 @endforeach
             </select>
-        </div>
+        </div> -->
     </div>
 </div>
 <div class="specifications-wrapper row gy-4"></div>
