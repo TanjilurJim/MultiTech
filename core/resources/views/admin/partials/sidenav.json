@@ -8,7 +8,7 @@
             "Control center",
             "Overview",
             "Main hub",
-            "Management hub",                                                                                       
+            "Management hub",
             "Administrative hub",
             "Central hub",
             "Command center",
@@ -76,7 +76,7 @@
                 "menu_active": "admin.users.email.unverified",
                 "counter": "emailUnverifiedUsersCount"
             },
-            
+
             {
                 "keyword": [
                     "Profile Completed customers",
@@ -117,6 +117,36 @@
             }
         ]
     },
+
+    "customer_database": {
+        "title": "Customer Database",
+        "icon": "las la-address-book", 
+        "menu_active": "admin.customers*",
+        "submenu": [
+            {
+                "keyword": [
+                    "customer database",
+                    "customers",
+                    "crm",
+                    "contact list"
+                ],
+                "title": "Database",
+                "route_name": "admin.customers.index",
+                "menu_active": "admin.customers.index"
+            },
+            {
+                "keyword": [
+                    "follow up",
+                    "follow-up report",
+                    "customer follow up",
+                    "crm"
+                ],
+                "title": "Follow-Up Report",
+                "route_name": "admin.followups.index",
+                "menu_active": "admin.followups.index"
+            }
+        ]
+    },
     "product_config": {
         "title": "Product Config",
         "icon": "lab la-dropbox",
@@ -129,38 +159,25 @@
         ],
         "submenu": [
             {
-                "keyword": [
-                    "Attributes",
-                    "Product Configuration"
-                ],
+                "keyword": ["Attributes", "Product Configuration"],
                 "title": "Attributes",
                 "route_name": "admin.attribute.all",
                 "menu_active": "admin.attribute*"
             },
             {
-                "keyword": [
-                    "Brands",
-                    "Product Configuration"
-                ],
+                "keyword": ["Brands", "Product Configuration"],
                 "title": "Brands",
                 "route_name": "admin.brand.all",
                 "menu_active": "admin.brand.*"
             },
             {
-                "keyword": [
-                    "Category",
-                    "Categories",
-                    "Product Configuration"
-                ],
+                "keyword": ["Category", "Categories", "Product Configuration"],
                 "title": "Categories",
                 "route_name": "admin.category.all",
                 "menu_active": "admin.category.*"
             },
             {
-                "keyword": [
-                    "Product Types",
-                    "Product Configuration"
-                ],
+                "keyword": ["Product Types", "Product Configuration"],
                 "title": "Product Types",
                 "route_name": "admin.product.type.all",
                 "menu_active": "admin.product.type*"
@@ -170,104 +187,68 @@
     "products": {
         "title": "Product",
         "icon": "la la-product-hunt",
-        "menu_active": [
-            "admin.products*",
-            "admin.media"
-        ],
-        "counters": [
-            "lowStockProductsCount",
-            "outOfStockProductsCount"
-        ],
+        "menu_active": ["admin.products*", "admin.media"],
+        "counters": ["lowStockProductsCount", "outOfStockProductsCount"],
         "submenu": [
             {
-                "keyword": [
-                    "Products",
-                    "Add Product"
-                ],
+                "keyword": ["Products", "Add Product"],
                 "title": "Add Product",
                 "route_name": "admin.products.create",
                 "menu_active": "admin.products.create"
             },
             {
-                "keyword": [
-                    "All Products",
-                    "Products"
-                ],
+                "keyword": ["All Products", "Products"],
                 "title": "All Products",
                 "route_name": "admin.products.all",
                 "menu_active": "admin.products.all"
             },
             {
-                "keyword": [
-                    "Featured Products",
-                    "Collections"
-                ],
+                "keyword": ["Featured Products", "Collections"],
                 "title": "Featured Products",
                 "route_name": "admin.collection.index",
                 "menu_active": "admin.collection*"
             },
             {
-                "keyword": [
-                    "Add Collection",
-                    "Create Collection"
-                ],
+                "keyword": ["Add Collection", "Create Collection"],
                 "title": "Add Collection",
                 "route_name": "admin.collection.create",
                 "menu_active": "admin.collection.create"
             },
-            
+
             {
-                "keyword": [
-                    "Low Stock Products",
-                    "Products"
-                ],
+                "keyword": ["Low Stock Products", "Products"],
                 "title": "Low Stock Products",
                 "route_name": "admin.products.low.stock",
                 "menu_active": "admin.products.low.stock",
                 "counter": "lowStockProductsCount"
             },
             {
-                "keyword": [
-                    "Out of Stock Products",
-                    "Products"
-                ],
+                "keyword": ["Out of Stock Products", "Products"],
                 "title": "Out of Stock Products",
                 "route_name": "admin.products.out.of.stock",
                 "menu_active": "admin.products.out.of.stock",
                 "counter": "outOfStockProductsCount"
             },
             {
-                "keyword": [
-                    "Top Selling Products"
-                ],
+                "keyword": ["Top Selling Products"],
                 "title": "Top Selling Products",
                 "route_name": "admin.products.top.selling",
                 "menu_active": "admin.products.top.selling*"
             },
             {
-                "keyword": [
-                    "Trashed Products"
-                ],
+                "keyword": ["Trashed Products"],
                 "title": "Trashed Products",
                 "route_name": "admin.products.trashed",
                 "menu_active": "admin.products.trashed*"
             },
             {
-                "keyword": [
-                    "Reviews",
-                    "Products"
-                ],
+                "keyword": ["Reviews", "Products"],
                 "title": "Reviews",
                 "route_name": "admin.products.reviews.index",
                 "menu_active": "admin.products.reviews*"
             },
             {
-                "keyword": [
-                    "media",
-                    "images",
-                    "photos",
-                    "product images"
-                ],
+                "keyword": ["media", "images", "photos", "product images"],
                 "title": "Media Files",
                 "route_name": "admin.media",
                 "menu_active": "admin.media"
@@ -278,27 +259,16 @@
     "promotion": {
         "title": "Promotion",
         "icon": "la la-bullhorn",
-        "menu_active": [
-            "admin.coupon*",
-            "admin.offer.*",
-            "admin.subscriber.*"
-        ],
+        "menu_active": ["admin.coupon*", "admin.offer.*", "admin.subscriber.*"],
         "submenu": [
-           
             {
-                "keyword": [
-                    "Offers",
-                    "Promotion"
-                ],
+                "keyword": ["Offers", "Promotion"],
                 "title": "Offers",
                 "route_name": "admin.offer.index",
                 "menu_active": "admin.offer*"
             },
             {
-                "keyword": [
-                    "Subscribers",
-                    "Promotion"
-                ],
+                "keyword": ["Subscribers", "Promotion"],
                 "title": "Subscribers",
                 "route_name": "admin.subscriber.index",
                 "menu_active": "admin.subscriber.index"
@@ -308,9 +278,7 @@
     "orders": {
         "title": "Orders",
         "icon": "las la-money-bill",
-        "menu_active": [
-            "admin.order*"
-        ],
+        "menu_active": ["admin.order*"],
         "counters": [
             "pendingOrdersCount",
             "processingOrdersCount",
@@ -318,76 +286,52 @@
         ],
         "submenu": [
             {
-                "keyword": [
-                    "All Orders",
-                    "Orders"
-                ],
+                "keyword": ["All Orders", "Orders"],
                 "title": "All Orders",
                 "route_name": "admin.order.index",
                 "menu_active": "admin.order.index"
             },
             {
-                "keyword": [
-                    "Pending Orders",
-                    "Orders"
-                ],
+                "keyword": ["Pending Orders", "Orders"],
                 "title": "Pending Orders",
                 "route_name": "admin.order.pending",
                 "menu_active": "admin.order.pending",
                 "counter": "pendingOrdersCount"
             },
             {
-                "keyword": [
-                    "Processing Orders",
-                    "Orders"
-                ],
+                "keyword": ["Processing Orders", "Orders"],
                 "title": "Processing Orders",
                 "route_name": "admin.order.processing",
                 "menu_active": "admin.order.processing",
                 "counter": "processingOrdersCount"
             },
             {
-                "keyword": [
-                    "Dispatched Orders",
-                    "Orders"
-                ],
+                "keyword": ["Dispatched Orders", "Orders"],
                 "title": "Dispatched Orders",
                 "route_name": "admin.order.dispatched",
                 "menu_active": "admin.order.dispatched",
                 "counter": "dispatchedOrdersCount"
             },
             {
-                "keyword": [
-                    "Delivered Orders",
-                    "Orders"
-                ],
+                "keyword": ["Delivered Orders", "Orders"],
                 "title": "Delivered Orders",
                 "route_name": "admin.order.delivered",
                 "menu_active": "admin.order.delivered"
             },
             {
-                "keyword": [
-                    "Canceled Orders",
-                    "Orders"
-                ],
+                "keyword": ["Canceled Orders", "Orders"],
                 "title": "Canceled Orders",
                 "route_name": "admin.order.canceled",
                 "menu_active": "admin.order.canceled"
             },
             {
-                "keyword": [
-                    "Returned Orders",
-                    "Orders"
-                ],
+                "keyword": ["Returned Orders", "Orders"],
                 "title": "Returned Orders",
                 "route_name": "admin.order.returned",
                 "menu_active": "admin.order.returned"
             },
             {
-                "keyword": [
-                    "COD Orders",
-                    "Orders"
-                ],
+                "keyword": ["COD Orders", "Orders"],
                 "title": "COD Orders",
                 "route_name": "admin.order.cod",
                 "menu_active": "admin.order.cod"
@@ -398,9 +342,7 @@
     "deposits": {
         "title": "Payments",
         "icon": "las la-file-invoice-dollar",
-        "counters": [
-            "pendingDepositsCount"
-        ],
+        "counters": ["pendingDepositsCount"],
         "menu_active": "admin.deposit*",
         "submenu": [
             {
@@ -496,9 +438,7 @@
     "support_ticket": {
         "title": "Support Ticket",
         "icon": "la la-ticket",
-        "counters": [
-            "pendingTicketCount"
-        ],
+        "counters": ["pendingTicketCount"],
         "menu_active": "admin.ticket*",
         "submenu": [
             {
@@ -551,13 +491,10 @@
             }
         ]
     },
+
     "store_setting": {
         "header": "Settings",
-        "keyword": [
-            "logo",
-            "favicon",
-            "favicon"
-        ],
+        "keyword": ["logo", "favicon", "favicon"],
         "title": "Store Front Settings",
         "icon": "las la-life-ring",
         "route_name": "admin.setting.system",
@@ -574,7 +511,7 @@
             "admin.maintenance.mode",
             "admin.setting.cookie",
             "admin.setting.custom.css",
-            
+
             "admin.setting.robot",
             "admin.frontend.index",
             "admin.frontend.sections*",
@@ -677,9 +614,7 @@
         "menu_active": "admin.setting.notification.*"
     },
     "shipping_methods": {
-        "keyword": [
-            "Shipping Methods"
-        ],
+        "keyword": ["Shipping Methods"],
         "title": "Shipping Methods",
         "icon": "la la-shipping-fast",
         "route_name": "admin.shipping.methods.all",
@@ -725,19 +660,13 @@
                 "menu_active": "admin.report.notification.history"
             },
             {
-                "keyword": [
-                    "Sales History",
-                    "Sales Report"
-                ],
+                "keyword": ["Sales History", "Sales Report"],
                 "title": "Overall Sales Report",
                 "route_name": "admin.report.sales",
                 "menu_active": "admin.report.sales"
             },
             {
-                "keyword": [
-                    "Sales History",
-                    "Sales Report"
-                ],
+                "keyword": ["Sales History", "Sales Report"],
                 "title": "Business Report",
                 "route_name": "admin.report.business",
                 "menu_active": "admin.report.business"
@@ -749,9 +678,7 @@
         "title": "Extra",
         "icon": "la la-server",
         "menu_active": "admin.system*",
-        "counters": [
-            "updateAvailable"
-        ],
+        "counters": ["updateAvailable"],
         "submenu": [
             {
                 "keyword": [
@@ -800,8 +727,6 @@
                 "route_name": "admin.system.optimize",
                 "menu_active": "admin.system.optimize"
             }
-
         ]
     }
-    
 }

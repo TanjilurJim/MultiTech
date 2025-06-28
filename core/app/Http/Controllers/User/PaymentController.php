@@ -55,7 +55,12 @@ class PaymentController extends Controller
             'name',
             'phone',
             'address',
+
         ]);
+        $checkoutData['division_id'] = $request->division_id;
+        $checkoutData['district_id'] = $request->district_id;
+        $checkoutData['area_name']   = $request->area_name;
+        $checkoutData['postcode']    = $request->postcode;
 
         if (!auth()->check()) {
             $checkoutData['guest_email'] = $request->guest_email;
@@ -81,6 +86,13 @@ class PaymentController extends Controller
 
 
         // dd('completeCheckout');
+
+        $request->validate([
+            'division_id' => 'required',
+            'district_id' => 'required',
+            'area_name'   => 'required',
+            'postcode'    => 'required',
+        ]);
 
         $this->validation($request);
 
@@ -340,6 +352,19 @@ class PaymentController extends Controller
         $order->user_id = auth()->id();
         $order->guest_email = $checkoutData['guest_email'] ?? null;
         $order->shipping_address =  $shippingAddress ? json_encode($shippingAddress) : null;;
+
+        if (!auth()->check()) {
+            $order->guest_name    = $checkoutData['shipping_address']['name'] ?? null;
+            $order->guest_phone   = $checkoutData['shipping_address']['phone'] ?? null;
+            $order->guest_address = $checkoutData['shipping_address']['address'] ?? null;
+
+            // ⬇ NEW – copy the location fields
+            $order->division_id = $checkoutData['division_id'] ?? null;
+            $order->district_id = $checkoutData['district_id'] ?? null;
+            $order->area_name   = $checkoutData['area_name']   ?? null;
+            $order->postcode    = $checkoutData['postcode']    ?? null;
+        }
+
         $order->shipping_method_id = $shippingMethod->id ?? 0;
         $order->shipping_charge = $shippingMethod->charge ?? 0;
         $order->is_cod = $gatewayCurrency->id ? 0 : 1;

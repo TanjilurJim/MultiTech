@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\PurchaserController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Models\OrderDetail;
 use App\Models\Order;
 use App\Models\Purchaser;
@@ -294,6 +295,34 @@ Route::middleware('admin')->group(function () {
         Route::post('approve/{id}', 'approve')->name('approve');
     });
 
+    Route::controller(CustomerController::class)
+        ->prefix('customers')
+        ->name('customers.')
+        ->group(function () {
+
+            // List + search + pagination
+            Route::get('/', 'index')->name('index');
+
+            // Create
+            Route::post('/', 'store')->name('store');
+
+            Route::get('/{customer}/edit',  'edit'   )->name('edit');  
+
+            // Update
+            Route::put('/{customer}', 'update')->name('update');
+
+            // Delete
+            Route::delete('/{customer}', 'destroy')->name('destroy');
+
+            // Export CSV / Excel
+            Route::get('/export', 'export')->name('export');
+
+            Route::get('/{customer}', 'show')->name('show');
+        });
+
+    Route::view('follow-ups', 'admin.followups.index')
+        ->name('followups.index');
+
     // Report
     Route::controller('ReportController')->prefix('report')->name('report.')->group(function () {
         Route::get('login/history', 'loginHistory')->name('login.history');
@@ -301,7 +330,7 @@ Route::middleware('admin')->group(function () {
         Route::get('notification/history', 'notificationHistory')->name('notification.history');
         Route::get('email/detail/{id}', 'emailDetails')->name('email.details');
         Route::get('sales-report', 'salesReport')->name('sales');
-         Route::get('business-report', 'businessReport')->name('business');
+        Route::get('business-report', 'businessReport')->name('business');
     });
 
     // Admin Support
@@ -330,9 +359,9 @@ Route::middleware('admin')->group(function () {
         Route::post('update/key/{id}', 'updateLanguageJson')->name('update.key');
         Route::get('get-keys', 'getKeys')->name('get.key');
     });
-  	
-  	Route::get('/admin/order/status-counts', [OrderController::class, 'statusCounts'])->name('order.status_counts');
-  
+
+    Route::get('/admin/order/status-counts', [OrderController::class, 'statusCounts'])->name('order.status_counts');
+
 
     Route::controller('GeneralSettingController')->group(function () {
 
@@ -358,8 +387,8 @@ Route::middleware('admin')->group(function () {
         Route::get('custom-css', 'customCss')->name('setting.custom.css');
         Route::post('custom-css', 'customCssSubmit');
 
-         Route::get('sitemap', 'sitemap')->name('setting.sitemap');
-         Route::post('sitemap', 'sitemapSubmit');
+        Route::get('sitemap', 'sitemap')->name('setting.sitemap');
+        Route::post('sitemap', 'sitemapSubmit');
 
         Route::get('robot', 'robot')->name('setting.robot');
         Route::post('robot', 'robotSubmit');
@@ -486,13 +515,14 @@ Route::middleware('admin')->group(function () {
     Route::post('stock/receive', [StockController::class, 'receive'])
         ->name('stock.receive');
 
-    Route::post('purchasers/store',        //  POST  admin/purchasers/store
-    [\App\Http\Controllers\Admin\PurchaserController::class, 'store']
-)->name('purchasers.store');
+    Route::post(
+        'purchasers/store',        //  POST  admin/purchasers/store
+        [\App\Http\Controllers\Admin\PurchaserController::class, 'store']
+    )->name('purchasers.store');
 
-// routes/admin.php
-Route::get('purchasers/search', [PurchaserController::class, 'select2'])
-     ->name('purchasers.search');
+    // routes/admin.php
+    Route::get('purchasers/search', [PurchaserController::class, 'select2'])
+        ->name('purchasers.search');
 });
 
 Route::get('sales/download', [OrderController::class, 'download'])->name('sales.download');
@@ -504,5 +534,3 @@ Route::get('reports/sales/csv', [ReportController::class, 'salesReportCsv'])->na
 // Route::get('/orders/download-excel', [OrderController::class, 'downloadExcel'])->name('admin.orders.download.excel');
 
 // Route::get('reports/business/download', [ReportController::class, 'businessReportDownload'])->name('admin.reports.business.download');
-
-

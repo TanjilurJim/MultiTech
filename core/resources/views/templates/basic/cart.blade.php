@@ -1,5 +1,7 @@
 @extends($activeTemplate . 'layouts.checkout')
-
+@php
+    $locations = getBangladeshLocationData();
+@endphp
 @php
     $couponAmount = $coupon['amount'] ?? 0;
     $shippingCharge = $shippingMethod->charge ?? 0;
@@ -78,6 +80,46 @@
                                             <label class="form-label">@lang('Delivery Address') <span
                                                     class="text-danger">*</span></label>
                                             <textarea name="address" class="form-control" rows="3" placeholder="@lang('Street address, apartment, floor, etc.')"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">@lang('Division') <span
+                                                    class="text-danger">*</span></label>
+                                            <select name="division_id" id="divisionSelect" class="form-control" required>
+                                                <option value="">@lang('Select Division')</option>
+                                                @foreach ($locations['divisions'] as $division)
+                                                    <option value="{{ $division['id'] }}">{{ $division['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">@lang('District') <span
+                                                    class="text-danger">*</span></label>
+                                            <select name="district_id" id="districtSelect" class="form-control" required>
+                                                <option value="">@lang('Select District')</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">@lang('Area/Upazila')</label>
+                                            <select name="area_name" id="areaSelect" class="form-control">
+                                                <option value="">@lang('Select Area')</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">@lang('Postcode')</label>
+                                            <input type="text" name="postcode" id="postcodeInput" class="form-control"
+                                                readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -528,6 +570,85 @@
 
         })(jQuery);
     </script>
+    <script>
+    const bdData = @json($locations);
+    bdData.postcodes = @json(json_decode(file_get_contents(resource_path('data/bd-postcodes.json')), true)['postcodes']);
+
+    $('#divisionSelect').on('change', function () {
+    const divisionId = $(this).val();
+
+    // reset
+    $('#districtSelect').html('<option value="">Select District</option>');
+    $('#areaSelect').html('<option value="">Select Area</option>');
+    $('#postcodeInput').val('');
+
+    const districts = bdData.districts.filter(d => d.division_id == divisionId);
+    districts.forEach(d => $('#districtSelect').append(
+        `<option value="${d.id}">${d.name}</option>`
+    ));
+});
+
+$('#districtSelect').on('change', function () {
+    const districtId = $(this).val();
+
+    // reset
+    $('#areaSelect').html('<option value="">Select Area</option>');
+    $('#postcodeInput').val('');
+
+    let areas;
+
+    if (districtId === '1') {                                 // Dhaka City
+        areas = bdData.dhaka.map(a => ({ name: a.name }));
+    } else {
+        areas = bdData.upazilas.filter(u => u.district_id == districtId);
+    }
+
+    areas.sort((a, b) => a.name.localeCompare(b.name));
+
+    areas.forEach(a => $('#areaSelect').append(
+        `<option value="${a.name}">${a.name}</option>`
+    ));
+});
+
+$('#areaSelect').on('change', function () {
+    const area     = $(this).val();
+    const district = $('#districtSelect').val();
+
+    // match either upazila or postOffice (case-insensitive)
+    const matches = bdData.postcodes.filter(p =>
+        p.district_id == district &&
+        (p.upazila.toLowerCase()   === area.toLowerCase() ||
+         p.postOffice.toLowerCase()=== area.toLowerCase())
+    );
+
+    if (matches.length === 1) {
+        // single match – autofill readonly
+        $('#postcodeInput')
+            .val(matches[0].postCode)
+            .prop('readonly', true);
+    } else if (matches.length > 1) {
+        // multiple – turn the input into a dropdown for user to pick
+        let $select = $('<select>', {
+            name: 'postcode',
+            id:   'postcodeInput',
+            class:'form-control',
+            required: true
+        }).append('<option value="">Select Postcode</option>');
+
+        matches.forEach(m => $select.append(
+            `<option value="${m.postCode}">${m.postOffice} (${m.postCode})</option>`
+        ));
+
+        $('#postcodeInput').replaceWith($select);shi
+    } else {
+        // no match – allow manual entry
+        $('#postcodeInput')
+            .replaceWith('<input type="text" name="postcode" id="postcodeInput" class="form-control" required>')
+            .val('')
+            .prop('readonly', false);
+    }
+});
+</script>
 @endpush
 
 @push('style')

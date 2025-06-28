@@ -33,3 +33,31 @@ if (!function_exists('getBangladeshLocationData')) {
         ];
     }
 }
+
+
+// app/Helpers/LocationHelper.php  (same file where getBangladeshLocationData lives)
+// if (! function_exists('getBangladeshLocationName')) {
+//     /**
+//      * Return the name for a Bangladeshi location ID.
+//      * Divisions have priority over districts, districts over upazilas,
+//      * so duplicate IDs don’t produce the wrong label.
+//      */
+//     function getBangladeshLocationName(int $id): string
+//     {
+//         static $loc = null;          // cached for the request
+//         if ($loc === null) {
+//             $loc = getBangladeshLocationData();
+//         }
+
+//         // 1) division?
+//         $name = collect($loc['divisions'])->firstWhere('id', $id)['name'] ?? null;
+//         if ($name) return $name;
+
+//         // 2) district?
+//         $name = collect($loc['districts'])->firstWhere('id', $id)['name'] ?? null;
+//         if ($name) return $name;
+
+//         // 3) upazila (thana)?
+//         return collect($loc['upazilas'])->firstWhere('id', $id)['name'] ?? '-';
+//     }
+// }

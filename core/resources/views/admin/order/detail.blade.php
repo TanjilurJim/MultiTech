@@ -1,5 +1,12 @@
 @extends('admin.layouts.app')
+@php
+    /* Grab the location arrays once */
+    $loc = getBangladeshLocationData();
 
+    $divisionName = collect($loc['divisions'])->firstWhere('id', $order->division_id)['name'] ?? '-';
+
+    $districtName = collect($loc['districts'])->firstWhere('id', $order->district_id)['name'] ?? '-';
+@endphp
 @section('panel')
     <div class="card">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-end">
@@ -13,7 +20,8 @@
                     </span>
                 </h5>
 
-                <span> {{ showDateTime($order->created_at, 'F d, Y') }} @lang('at') {{ showDateTime($order->created_at, 'h:i A') }} </span>
+                <span> {{ showDateTime($order->created_at, 'F d, Y') }} @lang('at')
+                    {{ showDateTime($order->created_at, 'h:i A') }} </span>
             </div>
         </div>
         <div class="card-body">
@@ -38,7 +46,10 @@
 
                             @foreach ($order->orderDetail as $data)
                                 @php
-                                    $mainImage = $data->productVariant && @$data->productVariant->main_image_id ? $data->productVariant->mainImage(false) : @$data->product->mainImage(false);
+                                    $mainImage =
+                                        $data->productVariant && @$data->productVariant->main_image_id
+                                            ? $data->productVariant->mainImage(false)
+                                            : @$data->product->mainImage(false);
                                 @endphp
 
                                 <tr>
@@ -88,7 +99,8 @@
                             </li>
                             @if ($order->appliedCoupon)
                                 <li>
-                                    <span>(<i class="la la-minus"></i>) @lang('Coupon') ({{ $order->appliedCoupon->coupon->coupon_code }})</span>
+                                    <span>(<i class="la la-minus"></i>) @lang('Coupon')
+                                        ({{ $order->appliedCoupon->coupon->coupon_code }})</span>
                                     <span> {{ showAmount($order->appliedCoupon->amount, 2) }}</span>
                                 </li>
                             @endif
@@ -151,10 +163,22 @@
                             <h6 class="mb-3">@lang('Shipping Details')</h6>
                             <ul class="info-address-list">
                                 <li>
-                                    <span class="title">@lang('Name') </span>
+                                    <span class="title">@lang('Name')</span>
                                     <span>
                                         <span class="devide-colon">:</span>
-                                        {{ $order->user->firstname }} {{ $order->user->lastname }}
+
+                                        @if ($order->user)
+                                            {{-- Registered customer --}}
+                                            {{ $order->user->firstname }} {{ $order->user->lastname }}
+                                        @elseif(!empty($shippingAddress->name))
+                                            {{-- Guest – name came with the shipping form --}}
+                                            {{ $shippingAddress->name }}
+                                        @elseif($order->guest_name)
+                                            {{-- Older records that still use guest_name column --}}
+                                            {{ $order->guest_name }}
+                                        @else
+                                            @lang('Guest User')
+                                        @endif
                                     </span>
                                 </li>
                                 <li>
@@ -172,13 +196,36 @@
                                     </span>
                                 </li>
 
+                                <li>
+                                    <span class="title">@lang('Area')</span>
+                                    <span><span class="devide-colon">:</span> {{ $order->area_name ?? '-' }}</span>
+                                </li>
+
+                                <li>
+                                    <span class="title">@lang('District')</span>
+                                    <span><span class="devide-colon">:</span> {{ $districtName }}</span>
+                                </li>
+
+                                <li>
+                                    <span class="title">@lang('Division')</span>
+                                    <span><span class="devide-colon">:</span> {{ $divisionName }}</span>
+                                </li> 
+
+                                <li>
+                                    <span class="title">@lang('Postcode')</span>
+                                    <span><span class="devide-colon">:</span> {{ $order->postcode ?? '-' }}</span>
+                                </li>
+
+
+
                             </ul>
                         </div>
                     @endif
                 </div>
             </div>
             <div class="text-end mt-3">
-                <a href="{{ route('admin.print.invoice', $order->id) }}" target=blank class="btn btn-dark m-1"> <i class="fa fa-print"></i>@lang('Print')</a>
+                <a href="{{ route('admin.print.invoice', $order->id) }}" target=blank class="btn btn-dark m-1"> <i
+                        class="fa fa-print"></i>@lang('Print')</a>
             </div>
         </div>
     </div>

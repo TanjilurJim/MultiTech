@@ -28,6 +28,8 @@
 <body>
     @yield('content')
 
+    <script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
     <script src="{{ asset('assets/global/js/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ asset('assets/global/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/admin/js/vendor/bootstrap-toggle.min.js') }}"></script>
