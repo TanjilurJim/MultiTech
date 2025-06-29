@@ -335,6 +335,17 @@ Route::middleware('admin')->group(function () {
 
             // Create form
             Route::get('/create',  'create')->name('create');
+            Route::get('report', [\App\Http\Controllers\Admin\FollowUpReportController::class, 'monthly'])
+                ->name('report');
+
+            Route::get(
+                '/monthly-summaries',
+                [\App\Http\Controllers\Admin\MonthlyFollowUpSummaryController::class, 'index']
+            )
+                ->name('summaries');
+
+            Route::post('/monthly-summaries/{summary}/note', [\App\Http\Controllers\Admin\MonthlyFollowUpSummaryController::class, 'updateNote'])
+                ->name('summaries.note.update');
 
             Route::get('/{log}',       'show')->name('show');
 
@@ -353,10 +364,10 @@ Route::middleware('admin')->group(function () {
     /* -------------------------------------------------
  |  30-Day Report & Excel export
  |-------------------------------------------------*/
-    Route::get(
-        'follow-ups/report',
-        [FollowUpReportController::class, 'monthly']
-    )->name('followups.report');
+    // Route::get(
+    //     'admin/follow-ups/report',
+    //     [FollowUpReportController::class, 'monthly']
+    // )->name('followups.report');
 
     // Report
     Route::controller('ReportController')->prefix('report')->name('report.')->group(function () {

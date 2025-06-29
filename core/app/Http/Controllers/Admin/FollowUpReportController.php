@@ -14,31 +14,33 @@ class FollowUpReportController extends Controller
     {
         $rangeStart = now()->subDays(30)->startOfDay();
 
-        $base = FollowUpLog::where('contact_date', '>=', $rangeStart);
+        $base = FollowUpLog::where('contact_date', '>=', now()->subDays(30))
+            ->where('admin_id', auth('admin')->id())   // <— just this
+            ->with('admin:id,name');
 
-        if (!auth()->user()->hasRole('admin')) {
-            $base->where('user_id', auth()->id());
-        }
-
+        /* ---- company-wide totals ---- */
         $stats = (clone $base)->selectRaw('
-                    SUM(customers_contacted) as contacted,
-                    SUM(potential_customers) as potential
+                    SUM(customers_contacted)  AS contacted,
+                    SUM(potential_customers)  AS potential
                  ')->first();
 
-        $summaries = (clone $base)->groupBy('user_id')
-            ->select('user_id')
-            ->selectRaw('SUM(customers_contacted) contacted, SUM(potential_customers) potential')
-            ->with('user:id,name')
+        /* ---- per-admin breakdown ---- */
+        $summaries = (clone $base)->groupBy('admin_id')
+            ->select('admin_id')
+            ->selectRaw('SUM(customers_contacted) contacted,
+                         SUM(potential_customers) potential')
+            ->with('admin:id,name')
             ->get();
 
-        /* excel download */
+        /* ---- Excel download ---- */
         if ($request->boolean('download')) {
             return Excel::download(
-                new MonthlyReportExport($summaries),
+                new MonthlyReportExport($summaries, $stats),
                 'follow-up-' . now()->format('Y-m-d') . '.xlsx'
             );
         }
 
-        return view('admin.followups.report', compact('stats', 'summaries'));
+        $pageTitle = '30-Day Follow-Up Report';
+        return view('admin.followups.report', compact('stats', 'summaries', 'pageTitle'));
     }
 }
