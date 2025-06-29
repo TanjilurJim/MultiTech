@@ -27,6 +27,12 @@
                     </span>
 
                     <span id="stockBadge"></span>
+                    <a href="https://wa.me/1234567890" target="_blank" class="whatsapp-button">
+                        <i class="fab fa-whatsapp"></i>
+                        <span class="whatsapp-text">Chat on WhatsApp</span>
+                    </a>
+
+
                 </div>
             </div>
 
@@ -57,13 +63,175 @@
                 @endif
             </span>
 
-
             <span>
                 <b class="product-details-label">@lang('SKU'):</b> <span
                     id="productSku">{{ $product->sku ?? __('Not available') }}</span>
             </span>
 
         </div>
+        <style>
+            .whatsapp-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                background-color: #25D366; /* WhatsApp green */
+                color: white;
+                padding: 12px 20px;
+                border-radius: 50px;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            .whatsapp-button i {
+                font-size: 20px;
+            }
+
+            .whatsapp-button:hover {
+                text-decoration: none !important;
+                border-bottom: none;
+            }
+
+            @media (max-width: 576px) {
+                .whatsapp-button {
+                    width: 100%;
+                    justify-content: center;
+                    font-size: 14px;
+                }
+
+                .whatsapp-button i {
+                    font-size: 18px;
+                }
+            }
+
+
+            /* Product Title */
+            .product-title {
+                font-size: 24px;
+                font-weight: 700;
+                color: #557DBF;
+                margin-bottom: 10px;
+            }
+
+            /* Ratings */
+            .ratings-area {
+                margin-bottom: 15px;
+                font-size: 14px;
+                color: #DD4637;
+            }
+
+            /* Product Price */
+            .product-price {
+                font-size: 22px;
+                font-weight: 700;
+                color: #DD4637 !important;
+            }
+
+            /* Product Summary */
+            .product-summary {
+                margin-top: 20px;
+                margin-bottom: 20px;
+                font-size: 15px;
+                color: #555;
+            }
+
+            /* Labels (Categories, Brand, SKU) */
+            .product-details-label {
+                color: #DD4637;
+                margin-right: 5px;
+                font-weight: 600;
+                font-size: 15px;
+            }
+
+            /* Categories, Brand links */
+            .product-details a {
+                color: #557DBF;
+                font-weight: 500;
+                margin-right: 3px;
+                text-decoration: none;
+            }
+
+            .product-details a:hover {
+                text-decoration: underline;
+            }
+
+            /* Attribute section */
+            .attribute-name {
+                display: inline-block;
+                margin: 15px 0 5px;
+                color: #557DBF;
+                font-weight: 600;
+            }
+
+            .attribute-value-wrapper {
+                margin-bottom: 15px;
+            }
+            
+            
+
+            /* Quantity & Add to Cart */
+            .product-add-to-cart {
+                margin-top: 25px;
+                margin-bottom: 15px;
+            }
+
+            /* Wishlist & Compare */
+            .product-wishlist .add-to-wishlist-btn,
+            .product-wishlist .addToCompare {
+                padding: 10px 15px;
+                border: 1px solid #ccc;
+                color: #557DBF;
+                background: transparent;
+                border-radius: 6px;
+                transition: 0.3s ease;
+                font-weight: 500;
+            }
+
+            .product-wishlist .add-to-wishlist-btn:hover,
+            .product-wishlist .addToCompare:hover,
+            .product-wishlist .add-to-wishlist-btn.active,
+            .product-wishlist .addToCompare.active {
+                background: #DD4637;
+                color: #fff;
+                border-color: #DD4637;
+            }
+
+            /* Buy Now and Add to Cart button */
+            .addToCart,
+            .buy-now-btn {
+                background-color:rgb(26, 56, 104);
+                color: #fff;
+                border: none;
+                padding: 10px 18px;
+                font-size: 14px;
+                font-weight: 600;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+            }
+
+            .addToCart:hover,
+            .buy-now-btn:hover {
+                background-color: #DD4637;
+            }
+
+            /* View details button */
+            .btn.outline {
+                border: 1px solid #557DBF;
+                color: #557DBF;
+                padding: 8px 16px;
+                font-size: 14px;
+                border-radius: 5px;
+                margin-top: 20px;
+            }
+
+            .btn.outline:hover {
+                background-color: #557DBF;
+                color: white;
+            }
+
+        </style>
 
         @if ($product->product_type == Status::PRODUCT_TYPE_VARIABLE && $product->attributes->count())
             <div class="product-attribute position-relative">
@@ -104,7 +272,7 @@
             </div>
         @endif
 
-        <div class="d-flex gap-2 flex-column">
+        <div class="d-flex flex-column">
             <div class="product-add-to-cart">
                 {{-- quantity input (unchanged) --}}
                 <x-frontend.quantity-input :isDigital="$product->is_downloadable" data-update="no" />
@@ -130,6 +298,7 @@
                         data-id="{{ $product->id }}">
                         <span class="wish-icon"></span> @lang('Wishlist')
                     </button>
+                    
                 @endif
 
                 @if ($product->product_type_id && gs('product_compare'))
@@ -139,18 +308,18 @@
                     </button>
                 @endif
             </div>
-
         </div>
 
         @if ($quickView)
             <div>
-                <a class="btn btn-sm btn--base outline" href="{{ $product->link() }}">@lang('View Details')</a>
+                <a class="btn btn-sm btn--base mt-2" href="{{ $product->link() }}">@lang('View Details')</a>
             </div>
         @endif
 
         @if (!$quickView)
             <x-frontend.product-sharer :product="$product" />
         @endif
+
     </div>
 </div>
 </div>

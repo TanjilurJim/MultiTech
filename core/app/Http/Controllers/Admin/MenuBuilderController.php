@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Frontend;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -93,6 +94,8 @@ class MenuBuilderController extends Controller
         $settings = Frontend::where('data_keys', 'header_three.content')->first()?->data_values;
         return view('admin.menu_builder.header_three', compact('pageTitle', 'links', 'settings'));
     }
+
+
 
     public function updateHeaderThree(Request $request) {
 
