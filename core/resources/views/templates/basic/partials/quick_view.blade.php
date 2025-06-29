@@ -298,7 +298,6 @@
                         data-id="{{ $product->id }}">
                         <span class="wish-icon"></span> @lang('Wishlist')
                     </button>
-                    
                 @endif
 
                 @if ($product->product_type_id && gs('product_compare'))

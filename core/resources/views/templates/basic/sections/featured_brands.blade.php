@@ -3,14 +3,14 @@
     $content = getContent('featured_brands.content', true);
 @endphp
 
-<!-- <section class="my-60">
+<section class="my-60">
     <div class="container">
         @if (!blank($topBrands))
             <div class="section-header">
                 <h5 class="title">{{ __(@$content->data_values->title) }}</h5>
             </div>
 
-            <div class="small-card">
+            <div class="brand-slider owl-theme owl-carousel">
                 @foreach ($topBrands as $brand)
                     <div class="small-card-item text-center">
                         <x-dynamic-component :component="frontendComponent('brand-card')" :brand="$brand" />
@@ -19,11 +19,11 @@
             </div>
         @endif
     </div>
-</section> -->
+</section>
 
 <style>
     .brand-slider .small-card-item {
-        height: 150px; /* Adjust this value as needed */
+        height: 150px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -43,56 +43,43 @@
         align-items: center;
     }
     
-
-    /* Position the previous arrow outside of the slider */
-    .owl-prev {
-        position: absolute;
-        left: -50px; 
-        top: 50%; 
-        transform: translateY(-50%); 
-        z-index: 10;
+    /* Hide arrows on mobile devices */
+    @media (max-width: 767px) {
+        .owl-prev, .owl-next {
+            display: none !important;
+        }
     }
 
-    /* Position the next arrow outside of the slider */
-    .owl-next {
-        position: absolute;
-        right: -50px; 
-        top: 50%; 
-        transform: translateY(-50%); 
-        z-index: 10;
-    }
+    /* Position arrows on larger screens */
+    @media (min-width: 768px) {
+        .owl-prev {
+            position: absolute;
+            left: -50px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            z-index: 10;
+        }
 
-    /* Optional: Add a background color and adjust appearance */
-    .owl-prev, .owl-next {
-        background-color: rgba(0, 0, 0, 0.5); 
-        color: white;
-        padding: 12px;
-        font-size: 20px;
-    }
+        .owl-next {
+            position: absolute;
+            right: -50px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            z-index: 10;
+        }
 
-    /* Optional: Add hover effect for the arrows */
-    .owl-prev:hover, .owl-next:hover {
-        background-color: rgba(0, 0, 0, 0.7); /* Darker background on hover */
+        .owl-prev, .owl-next {
+            background-color: rgba(0, 0, 0, 0.5); 
+            color: white;
+            padding: 12px;
+            font-size: 20px;
+        }
+
+        .owl-prev:hover, .owl-next:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
     }
 </style>
-
-<section class="my-60">
-    <div class="container">
-        @if (!blank($topBrands))
-            <div class="section-header">
-                <h5 class="title">{{ __(@$content->data_values->title) }}</h5>
-            </div>
-
-            <div class="brand-slider owl-theme owl-carousel">
-                @foreach ($topBrands as $brand)
-                    <div class="small-card-item text-center">
-                        <x-dynamic-component :component="frontendComponent('brand-card')" :brand="$brand" />
-                    </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
-</section>
 
 @push('script')
     <script>
@@ -102,37 +89,46 @@
             $(".brand-slider").owlCarousel({
                 margin: 16,
                 responsiveClass: true,
-                items: 7,  // Show 7 brands per slide
-                nav: true,  // Enable navigation arrows
+                items: 7,
+                nav: true,
                 dots: false,
                 autoplay: true,
-                autoplayTimeout: 5000,  // Slide every 5 seconds
+                autoplayTimeout: 5000,
                 loop: true,
                 lazyLoad: true,
                 responsive: {
                     0: {
-                        items: 1,  // Show 1 item on small screens
+                        items: 1,
+                        nav: false // Disable arrows on small screens
                     },
                     425: {
-                        items: 2,  // Show 2 items on medium screens
+                        items: 2,
+                        nav: false // Disable arrows on medium-small screens
                     },
                     768: {
-                        items: 4,  // Show 4 items on larger screens
+                        items: 3,
+                        nav: true // Enable arrows on tablets and larger
                     },
                     992: {
-                        items: 5,  // Show 5 items on even larger screens
+                        items: 5
                     },
-                    1199: {
-                        items: 8,  // Show 7 items on large screens
+                    1200: {
+                        items: 7
                     }
                 },
                 onInitialized: function() {
-                    // Always show the arrows, even if there are fewer items
-                    $(".owl-prev, .owl-next").show();
+                    // Hide arrows on mobile after initialization
+                    if ($(window).width() < 768) {
+                        $(".owl-prev, .owl-next").hide();
+                    }
                 },
                 onResize: function() {
-                    // Show arrows when resizing the window
-                    $(".owl-prev, .owl-next").show();
+                    // Toggle arrows visibility based on screen size
+                    if ($(window).width() < 768) {
+                        $(".owl-prev, .owl-next").hide();
+                    } else {
+                        $(".owl-prev, .owl-next").show();
+                    }
                 }
             });
         })(jQuery);

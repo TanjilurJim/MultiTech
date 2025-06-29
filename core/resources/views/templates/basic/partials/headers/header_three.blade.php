@@ -8,6 +8,9 @@
     $layoutClass = 'primary-menu-' . implode('', $firstLetters);
 
     $headerColor = $headerThree?->background_color ?? gs('base_color');
+
+    $featuredCategories = \App\Models\Category::where('feature_in_banner', 1)->with('subcategories.allSubcategories')->get();
+    $mainMenuLimit = 9;
 @endphp
 
 @if (@$headerThree->status == 'on')
@@ -22,89 +25,161 @@
                         <span></span>
                     </button>
 
-                    @foreach ($headerThree->group as $key => $group)
-                        @if ($key == 'category_widget' && isset($group->status) && $group->status == 'on')
-                            <div class="d-none d-lg-block view-category-wrapper">
-                                <div class="view-category">
-                                    <div class="menu-category-btn" @if (@$group->background_color) style="background-color: {{ '#' . $group->background_color }}" @endif>
-                                        <x-svg.category-icon />
-                                        @lang('Categories')
-                                    </div>
-                                </div>
-
-                                <div class="category-dropdown-menu">
-                                    @include('Template::partials.left_category_menu', ['limit' => null])
-                                </div>
-                            </div>
-                        @elseif($key == 'links')
-                            @include('Template::partials.menu.site_menu', [
-                                'classes' => 'd-none d-lg-flex',
-                            ])
-                        @endif
-
-                        @if ($key == 'widgets')
-                            <div class="action-btn-inner d-flex">
-                                @foreach (collect($group)->where('status', 'on') as $widget)
-                                    @if ($widget->key == 'cart')
-                                        <div class="cart-icon-design">
-                                            <button class="button cart-button flex-shrink-0" @disabled(Route::is('cart.page')) @if (@$widget->background_color) style="background-color: {{ '#' . $widget->background_color }} !important" @endif>
-                                                <i class="las la-shopping-bag"></i>
-                                                <span class="flex-shrink-0">
-                                                    <span class="amount d-block">{{ gs('cur_sym') }}<span class="cartSubtotal">0</span></span>
-                                                    <span class="items d-block">(<span class="cartItemCount">0</span>) @lang('items')</span>
-                                                </span>
-                                            </button>
-                                        </div>
-                                    @elseif($widget->key == 'wishlist' && gs('product_wishlist'))
-                                        <div class="cart-icon-design widget--style" @if (@$widget->background_color) style="background-color: {{ '#' . @$widget->background_color }} !important" @endif>
-                                            <button class="button wish-button" @disabled(Route::is('wishlist.page')) id="wish-button">
-                                                <span class="ico">
-                                                    <i class="lar la-heart"></i>
-                                                </span>
-                                                <span class="wishlist-count ecommerce__is">0</span>
-                                            </button>
-                                        </div>
-                                    @elseif($widget->key == 'compare' && gs('product_compare'))
-                                        <div class="cart-icon-design widget--style" @if (@$widget->background_color) style="background-color: {{ '#' . @$widget->background_color }} !important" @endif>
-                                            <a href="{{ route('compare.all') }}">
-                                                <span class="ico">
-                                                    <i class="las la-exchange-alt"></i>
-                                                </span>
-                                                <span class="compare-count ecommerce__is">0</span>
+                    <!-- <nav class="navbar navbar-expand-lg navbar-light"> -->
+                    <nav class="navbar navbar-expand-lg navbar-light py-0">
+                        <div class="container-fluid px-0">
+                            <div class="collapse navbar-collapse" id="navbarMegaMenu">
+                                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                    @foreach ($featuredCategories->take($mainMenuLimit) as $category)
+                                        <li class="nav-item dropdown position-static group">
+                                            <a class="nav-link main-menu-link d-flex align-items-center justify-content-between p-3" href="{{ $category->shopLink() }}">
+                                                <span>{{ $category->name }}</span>
+                                                @if ($category->subcategories->count())
+                                                    <i class="fas fa-chevron-down ms-1 transition-transform group-hover:rotate-180"></i>
+                                                @endif
                                             </a>
-                                        </div>
-                                    @elseif($widget->key == 'user_auth')
-                                        <div class="h-100 d-flex align-items-center" @if (@$widget->background_color) style="background-color: {{ '#' . @$widget->background_color }} !important" @endif>
-                                            @include('Template::partials.user_auth_options')
-                                        </div>
-                                    @elseif($widget->key == 'language')
-                                        <div class="h-100 d-flex align-items-center" @if (@$widget->background_color) style="background-color: {{ '#' . @$widget->background_color }} !important" @endif>
-                                            @include($activeTemplate . 'partials.menu.language_menu')
-                                        </div>
-                                    @elseif($widget->key == 'notifications')
-                                        <div class="h-100 d-flex align-items-center" @if (@$widget->background_color) style="background-color: {{ '#' . @$widget->background_color }} !important" @endif>
-                                            <x-user-notification-component />
-                                        </div>
+                                            @if ($category->subcategories->count())
+                                                <div class="dropdown-menu mega-dropdown fullwidth p-3">
+                                                    <div class="row">
+                                                        @foreach ($category->subcategories->chunk(ceil($category->subcategories->count() / 3)) as $chunk)
+                                                            <div class="col-md-4">
+                                                                <ul class="list-unstyled">
+                                                                    @foreach ($chunk as $subcategory)
+                                                                        <li class="position-relative group">
+                                                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{{ $subcategory->shopLink() ?? '#' }}">
+                                                                                {{ $subcategory->name }}
+                                                                                @if ($subcategory->allSubcategories->count())
+                                                                                    <i class="fas fa-angle-right"></i>
+                                                                                @endif
+                                                                            </a>
+                                                                            @if ($subcategory->allSubcategories->count())
+                                                                                <ul class="dropdown-menu sub-menu">
+                                                                                    @foreach ($subcategory->allSubcategories as $child)
+                                                                                        <li>
+                                                                                            <a class="dropdown-item" href="{{ $child->shopLink() ?? '#' }}">{{ $child->name }}</a>
+                                                                                        </li>
+                                                                                    @endforeach
+                                                                                </ul>
+                                                                            @endif
+                                                                        </li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </li>
+                                    @endforeach
+
+                                    @if ($featuredCategories->count() > $mainMenuLimit)
+                                        <li class="nav-item dropdown position-static">
+                                            <a class="nav-link main-menu-link d-flex align-items-center justify-content-between" href="#" id="viewMoreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span>View More</span>
+                                                <i class="fas fa-chevron-down ms-1"></i>
+                                            </a>
+                                            <ul class="dropdown-menu p-2">
+                                                @foreach ($featuredCategories->slice($mainMenuLimit) as $category)
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ $category->shopLink() }}">{{ $category->name }}</a>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </li>
                                     @endif
-                                @endforeach
+                                </ul>
                             </div>
-                        @endif
-                    @endforeach
+                        </div>
+                    </nav>
+
                 </div>
             </div>
         </div>
     </div>
 @endif
 
-
 @push('style')
     <style>
         .header-bottom {
-            background-color: #{{ $headerColor }}
+            background-color: #{{ $headerColor }};
         }
 
-        .menu li a.active {
-            background-color: #ffffff33;
+        .main-menu-link {
+            position: relative;
+            padding: 10px 15px;
+            color: #fff;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .main-menu-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .mega-dropdown.fullwidth {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            z-index: 1050;
+            width: 100%;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item.dropdown:hover > .mega-dropdown.fullwidth {
+            display: block;
+        }
+
+        /* .dropdown-menu.sub-menu {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            min-width: 220px;
+            background: #fff;
+            z-index: 1051;
+        }
+
+        li.position-relative:hover > .dropdown-menu.sub-menu {
+            display: block;
+        } */
+         
+
+        /* ...existing code... */
+        .dropdown-menu.sub-menu {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            min-width: 220px;
+            background: #fff;
+            z-index: 1051;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            padding: 0;
+        }
+
+        li.position-relative:hover > .dropdown-menu.sub-menu,
+        li.position-relative:focus-within > .dropdown-menu.sub-menu {
+            display: block;
+        }
+
+        li.position-relative {
+            position: relative;
+        }
+        /* ...existing code... */
+
+
+        .dropdown-item {
+            font-size: 14px;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+            color: #DA2128;
         }
     </style>
 @endpush

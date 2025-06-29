@@ -14,13 +14,14 @@
         $categoriesToShow = [
             768 => ['items' => 6],
             992 => ['items' => 7],
-            1199 => ['items' => 9],
+            1199 => ['items' => 8],
         ];
     }
 @endphp
+
 <style>
     .brand-slider .small-card-item {
-        height: 150px; /* Adjust this value as needed */
+        height: 150px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -40,39 +41,59 @@
         align-items: center;
     }
 
-    /* Position the previous arrow outside of the slider */
-    .owl-prev {
+    /* Owl Navigation Container */
+    .featured-category-slider .owl-nav {
+        display: block !important;
+    }
+
+    /* Navigation arrows */
+    .featured-category-slider .owl-prev,
+    .featured-category-slider .owl-next {
         position: absolute;
-        left: -50px; 
-        top: 50%; 
-        transform: translateY(-50%); 
-        z-index: 10;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.5) !important;
+        color: white !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        font-size: 18px !important;
     }
 
-    /* Position the next arrow outside of the slider */
-    .owl-next {
-        position: absolute;
-        right: -50px; 
-        top: 50%; 
-        transform: translateY(-50%); 
-        z-index: 10;
+    .featured-category-slider .owl-prev:hover,
+    .featured-category-slider .owl-next:hover {
+        background: rgba(0, 0, 0, 0.7) !important;
     }
 
-    /* Optional: Add a background color and adjust appearance */
-    .owl-prev, .owl-next {
-        background-color: rgba(0, 0, 0, 0.5); 
-        color: white;
-        padding: 12px;
-        font-size: 20px;
+    .featured-category-slider .owl-prev {
+        left: -50px;
     }
 
-    /* Optional: Add hover effect for the arrows */
-    .owl-prev:hover, .owl-next:hover {
-        background-color: rgba(0, 0, 0, 0.7); /* Darker background on hover */
+    .featured-category-slider .owl-next {
+        right: -50px;
+    }
+
+    /* Hide arrows on mobile */
+    @media (max-width: 1199px) {
+        .featured-category-slider .owl-nav {
+            display: none !important;
+        }
+    }
+    
+    /* Center slider content */
+    .featured-category-slider .owl-stage {
+        display: flex;
+        align-items: center;
     }
 </style>
+
 @if (!blank($featuredCategories))
-    <div class="overflow-hidden">
+    <div class="overflow-hidden position-relative" style="padding: 0 50px;">
         <div class="featured-category-slider owl-theme owl-carousel">
             @foreach ($featuredCategories as $category)
                 <div class="single-category p-2">
@@ -90,36 +111,48 @@
 
                 const viewItems = {
                     0: {
-                        items: 3,
+                        items: 2,
                         margin: 12,
+                        nav: false
                     },
                     425: {
-                        items: 4,
+                        items: 3,
                         margin: 12,
+                        nav: false
                     },
                     575: {
                         items: 4,
                         margin: 12,
+                        nav: false
                     },
                     ...categoriesToShow
                 };
 
-
+                // Enable navigation only on large screens
+                viewItems[1199] = {
+                    ...viewItems[1199],
+                    nav: true
+                };
 
                 $(".featured-category-slider").owlCarousel({
                     margin: 16,
                     responsiveClass: true,
                     items: 3,
-                    nav: false,
                     dots: false,
                     autoplay: true,
                     autoplayTimeout: 4000,
                     loop: true,
                     lazyLoad: true,
                     responsive: viewItems,
+                    nav: true,
+                    
+                    onInitialized: function(event) {
+                        // Adjust arrow positions after initialization
+                        $('.featured-category-slider .owl-prev').css('left', '-50px');
+                        $('.featured-category-slider .owl-next').css('right', '-50px');
+                    }
                 });
             })(jQuery);
         </script>
     @endpush
-
 @endif
