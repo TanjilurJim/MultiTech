@@ -1,6 +1,7 @@
 @extends('Template::layouts.master')
 @section('content')
     @include('Template::sections.banner')
+    
     @if ($sections->secs != null)
         @foreach (json_decode($sections->secs) as $sec)
             @if (View::exists('Template::sections.' . $sec))

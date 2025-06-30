@@ -16,13 +16,65 @@
         "element": {
             "images": {
                 "slider": {
-                    "size": "1284x345"
+                    "size": "500x300"
                 }
             },
             "link": "text",
             "modal": true
         }
     },
+    "banner1": {
+        "page": "home",
+        "builder": true,
+        "name": "Banner Section 1",
+        "content": {
+            "images": {
+                "banner_image": {
+                    "size": "400x240"
+                }
+            },
+            "banner_heading": "text",
+            "link":"text"
+        }
+    },
+    "banner2": {
+        "page": "home",
+        "builder": true,
+        "name": "Banner Section 2",
+        "content": {
+            "images": {
+                "banner_image": {
+                    "size": "400x240"
+                }
+            },
+            "banner_heading": "text",
+            "link":"text"
+        }
+    },    
+
+    "notices": {
+        "page": "home",
+        "builder": true,
+        "name": "Notice Section",
+        "element": {
+            "title": "text",
+            "link": "url",
+            "modal": true
+        }
+    },
+    "text_content": {
+        "page": "home",
+        "builder": true,
+        "name": "Text Content",
+        "element": {
+            "title": "text",
+            "description": "",
+            "modal": true
+        }
+    },
+    
+
+    
     "top_selling_products": {
         "page": "home",
         "builder": true,
@@ -178,6 +230,7 @@
             "modal": true
         }
     },
+    
     "footer": {
         "builder": true,
         "no_selection": true,

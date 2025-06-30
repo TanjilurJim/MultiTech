@@ -957,7 +957,7 @@ input[type='submit'] {
 .footer-top {
     display: flex;
     justify-content: space-between;
-    gap: 70px;
+    gap: 50px;
     padding-top: 60px;
 }
 
@@ -2378,7 +2378,7 @@ a.dropdown-menu__item:last-child {
 }
 
 .subscribe-form input {
-    height: 45px !important;
+    height: 40px !important;
     border: none;
     background: hsl(var(--white));
     border-radius: 5px;
@@ -2395,7 +2395,7 @@ a.dropdown-menu__item:last-child {
 
 .subscribe-form button {
     color: hsl(var(--white));
-    height: 45px !important;
+    height: 40px !important;
     background: hsl(var(--base));
     border-radius: 5px !important;
     font-size: 0.875rem;
@@ -3344,7 +3344,7 @@ button.owl-next.disabled {
 .product-card .product-content .price,
 .best-sell-item .price {
     font-weight: 600;
-    color: hsl(var(--base));
+    color: #dd4637;
     font-size: 0.875rem;
     overscroll-behavior: contain;
 }
@@ -3498,7 +3498,7 @@ button.owl-next.disabled {
 .product-details {
     display: flex;
     flex-direction: column;
-    gap: 1.8rem;
+    gap: 5px;
 }
 
 @media (max-width: 575px) {
@@ -9734,14 +9734,14 @@ table.table.print-payment-table tbody tr td {
     align-items:center;
     justify-content:center;
     gap:4px;
-    background:#f1f1f1;
+    background:#DD4637;
     border-radius:3px;
-    color:hsl(var(--black)/0.7);
+    color:white;
     font-weight:500;
     transition:.3s;
 }
 .button-group .add-to-cart-btn:hover{
-    background:hsl(var(--black)/0.8);
+    background:#9c291e;
     color:hsl(var(--white)/0.9);
 }
 
@@ -9780,19 +9780,19 @@ table.table.print-payment-table tbody tr td {
     align-items:center;
     justify-content:center;
     gap:4px;
-    background:#f1f1f1;
+    background:#557DBF;
     border-radius:3px;
-    color:hsl(var(--black)/0.7);
+    color:white;
     font-weight:500;
     transition:.3s;
 }
 .button-group .buy-now-btn:hover{
-    background:hsl(var(--orange));
+    background:#2d4c7e;
     color:hsl(var(--white)/0.9);
 }
 
 .buy-now-btn:hover {
-    background: hsl(var(--orange) / 0.2);
+    background: #2d4c7e;
     color: hsl(var(--white) / 0.9);
 }
 
