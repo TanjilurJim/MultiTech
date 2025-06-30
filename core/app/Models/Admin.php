@@ -13,7 +13,12 @@ class Admin extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
+    public function followUpLogs()
+    {
+        return $this->hasMany(\App\Models\FollowUpLog::class);
+    }
 }

@@ -7,6 +7,7 @@ use App\Traits\UserNotify;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\followUpLog;
 
 class User extends Authenticatable
 {
@@ -111,5 +112,10 @@ class User extends Authenticatable
     public function deviceTokens()
     {
         return $this->hasMany(DeviceToken::class);
+    }
+
+    public function followUpLogs()
+    {
+        return $this->hasMany(FollowUpLog::class);
     }
 }

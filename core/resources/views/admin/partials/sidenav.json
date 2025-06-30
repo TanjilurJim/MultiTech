@@ -141,9 +141,31 @@
                     "customer follow up",
                     "crm"
                 ],
-                "title": "Follow-Up Report",
+                "title": "Follow-Up Report Log",
                 "route_name": "admin.followups.index",
                 "menu_active": "admin.followups.index"
+            },
+            {
+                "keyword": [
+                    "follow up",
+                    "follow-up report",
+                    "customer follow up",
+                    "crm"
+                ],
+                "title": "Follow-Up Report ",
+                "route_name": "admin.followups.report",
+                "menu_active": "admin.followups.report"
+            },
+            {
+                "keyword": [
+                    "follow up",
+                    "follow-up report",
+                    "customer follow up",
+                    "crm"
+                ],
+                "title": "Follow-Up Summaries ",
+                "route_name": "admin.followups.summaries",
+                "menu_active": "admin.followups.summaries"
             }
         ]
     },

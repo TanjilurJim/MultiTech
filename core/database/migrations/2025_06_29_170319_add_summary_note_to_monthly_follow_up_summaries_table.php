@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            //
-            $table->string('postcode')->nullable()->after('area_name');
+        Schema::table('monthly_follow_up_summaries', function (Blueprint $table) {
+            $table->text('summary_note')->nullable();
         });
     }
 
@@ -22,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
+        Schema::table('monthly_follow_up_summaries', function (Blueprint $table) {
             //
         });
     }

@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\PurchaserController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\FollowUpReportController;
+use App\Http\Controllers\Admin\FollowUpLogController;
 use App\Models\OrderDetail;
 use App\Models\Order;
 use App\Models\Purchaser;
@@ -306,7 +308,7 @@ Route::middleware('admin')->group(function () {
             // Create
             Route::post('/', 'store')->name('store');
 
-            Route::get('/{customer}/edit',  'edit'   )->name('edit');  
+            Route::get('/{customer}/edit',  'edit')->name('edit');
 
             // Update
             Route::put('/{customer}', 'update')->name('update');
@@ -320,8 +322,52 @@ Route::middleware('admin')->group(function () {
             Route::get('/{customer}', 'show')->name('show');
         });
 
-    Route::view('follow-ups', 'admin.followups.index')
-        ->name('followups.index');
+    /* -------------------------------------------------
+ |  Daily Follow-Up CRUD
+ |-------------------------------------------------*/
+    Route::prefix('follow-ups')
+        ->name('followups.')
+        ->controller(FollowUpLogController::class)
+        ->group(function () {
+
+            // List + search + pagination
+            Route::get('/',        'index')->name('index');
+
+            // Create form
+            Route::get('/create',  'create')->name('create');
+            Route::get('report', [\App\Http\Controllers\Admin\FollowUpReportController::class, 'monthly'])
+                ->name('report');
+
+            Route::get(
+                '/monthly-summaries',
+                [\App\Http\Controllers\Admin\MonthlyFollowUpSummaryController::class, 'index']
+            )
+                ->name('summaries');
+
+            Route::post('/monthly-summaries/{summary}/note', [\App\Http\Controllers\Admin\MonthlyFollowUpSummaryController::class, 'updateNote'])
+                ->name('summaries.note.update');
+
+            Route::get('/{log}',       'show')->name('show');
+
+            // Store
+            Route::post('/',       'store')->name('store');
+
+            Route::get('/{log}/edit', 'edit')->name('edit');
+            Route::put('/{log}',      'update')->name('update');
+
+            // (Optional) Edit / Update / Delete
+            // Route::get('/{log}/edit', 'edit')->name('edit');
+            // Route::put('/{log}',      'update')->name('update');
+            Route::delete('/{log}',   'destroy')->name('destroy');
+        });
+
+    /* -------------------------------------------------
+ |  30-Day Report & Excel export
+ |-------------------------------------------------*/
+    // Route::get(
+    //     'admin/follow-ups/report',
+    //     [FollowUpReportController::class, 'monthly']
+    // )->name('followups.report');
 
     // Report
     Route::controller('ReportController')->prefix('report')->name('report.')->group(function () {
