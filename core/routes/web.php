@@ -7,6 +7,7 @@ use App\Http\Controllers\GuestOrderController;
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
+Route::redirect('/', '/admin')->name('home.redirect');
 
 
 // User Support Ticket
@@ -91,7 +92,7 @@ Route::controller('SiteController')->group(function () {
 	//dynamic sitemap
 	Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
-    Route::get('/', 'index')->name('home');
+    // Route::get('/', 'index')->name('home');
 });
 
 Route::get('/guest/order/{order_number}',        //  ← public URL

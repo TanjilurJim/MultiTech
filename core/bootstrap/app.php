@@ -65,6 +65,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => RedirectIfNotAdmin::class,
             'admin.guest' => RedirectIfAdmin::class,
 
+
+            // ✨ Spatie aliases — add these ↓↓↓
+            'role'               => Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission'         => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+
             'check.status' => CheckStatus::class,
             'demo' => Demo::class,
             'checkout.step' => CheckoutStepMiddleware::class,

@@ -32,10 +32,10 @@
             {{-- @if (version_compare(gs('available_version'), systemDetails()['version'], '>'))
                 <li><button type="button" class="primary--layer" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@lang('Update Available')"><a href="{{ route('admin.system.update') }}" class="primary--layer"><i class="las la-download text--warning"></i></a> </button></li>
             @endif --}}
-            <li>
+            {{-- <li>
                 <a href="{{ route('home') }}" title="@lang('Visit Website')" target="_blank"><i class="las la-globe"></i></a>
-            </li>
-            <li class="dropdown">
+            </li> --}}
+            {{-- <li class="dropdown">
                 <button type="button" class="primary--layer notification-bell" data-bs-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
                     <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="@lang('Unread Notifications')">
                         <i class="las la-bell @if ($adminNotificationCount > 0) icon-left-right @endif"></i>
@@ -73,10 +73,10 @@
                         <a href="{{ route('admin.notifications') }}" class="view-all-message">@lang('View all notifications')</a>
                     </div>
                 </div>
-            </li>
-            <li>
+            </li> --}}
+            {{-- <li>
                 <a href="{{ route('admin.setting.system') }}" title="@lang('Store Front Setting')"><i class="las la-wrench"></i></a>
-            </li>
+            </li> --}}
             <li class="dropdown d-flex profile-dropdown">
                 <button type="button" data-bs-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
                     <span class="navbar-user">

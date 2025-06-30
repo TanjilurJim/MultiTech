@@ -6,7 +6,7 @@
             <div class="card summary-card">
                 <div class="card-body">
                     <h5 class="card-title">@lang('Summary')</h5>
-                    <div class="row g-0">
+                    {{-- <div class="row g-0">
                         <div class="col-xl-3 col-sm-6">
                             <div class="p-3 border-card h-100">
                                 <small class="text-muted">@lang('Total Sales')</small>
@@ -34,12 +34,12 @@
                                 <h5>{{ showAmount($deposit['total_deposit_charge']) }}</h5>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
 
-        <div class="col-xxl-3 col-sm-6">
+        {{-- <div class="col-xxl-3 col-sm-6">
             <div class="card h-100">
                 <div class="card-body p-0">
                     <h5 class="card-title pt-3 ps-3">@lang('Orders')</h5>
@@ -57,9 +57,9 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
-        <div class="col-xxl-3 col-sm-6">
+        {{-- <div class="col-xxl-3 col-sm-6">
             <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title mb-3">@lang('Attention Required')</h5>
@@ -87,9 +87,9 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
-        <div class="col-xxl-6 col-xl-12">
+        {{-- <div class="col-xxl-6 col-xl-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title mb-3">@lang('Customers')</h5>
@@ -134,10 +134,10 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 
-    <div class="row mt-1 gy-4">
+    {{-- <div class="row mt-1 gy-4">
         <div class="col-lg-6">
             <div class="card h-100">
                 <div class="card-body">
@@ -193,9 +193,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
-    <div class="row gy-4 mt-1">
+    {{-- <div class="row gy-4 mt-1">
         <div class="col-12">
             <div class="row gy-4">
                 <div class="col-xxl-6">
@@ -300,9 +300,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
-    <div class="row gy-4 mt-1">
+    {{-- <div class="row gy-4 mt-1">
         <div class="col-xl-4 col-lg-6 mb-30">
             <div class="card">
                 <div class="card-body">
@@ -327,7 +327,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @push('script-lib')
