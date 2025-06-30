@@ -14,172 +14,172 @@
 @endphp
 
 @if (@$headerThree->status == 'on')
-    <div class="header-bottom @if (gs('homepage_layout') == 'full_width_banner') without-category @endif">
-        <div class="container">
-            <div class="row g-0">
-                <div class="header-bottom-wrapper {{ $layoutClass }}">
+    <div class="header-bottom @if (gs('homepage_layout') == 'full_width_banner') without-category @endif" style="background-color: #{{ $headerColor }}">
+    <div class="container">
+        <div class="row g-0">
+            <div class="header-bottom-wrapper {{ $layoutClass }}">
+                <nav class="navbar navbar-expand-lg navbar-light py-0 w-100">
+                    <div class="container-fluid px-0">
+                        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMegaMenu" aria-controls="navbarMegaMenu" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
 
-                    <button class="primary-menu-button d-lg-none">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-
-                    <!-- <nav class="navbar navbar-expand-lg navbar-light"> -->
-                    <nav class="navbar navbar-expand-lg navbar-light py-0">
-                        <div class="container-fluid px-0">
-                            <div class="collapse navbar-collapse" id="navbarMegaMenu">
-                                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                    @foreach ($featuredCategories->take($mainMenuLimit) as $category)
-                                        <li class="nav-item dropdown position-static group">
-                                            <a class="nav-link main-menu-link d-flex align-items-center justify-content-between p-3" href="{{ $category->shopLink() }}">
-                                                <span>{{ $category->name }}</span>
-                                                @if ($category->subcategories->count())
-                                                    <i class="fas fa-chevron-down ms-1 transition-transform group-hover:rotate-180"></i>
-                                                @endif
-                                            </a>
+                        <div class="collapse navbar-collapse" id="navbarMegaMenu">
+                            <ul class="main-menu navbar-nav flex-lg-row flex-column">
+                                @foreach ($featuredCategories as $category)
+                                    <li class="menu-item nav-item">
+                                        <a class="nav-link" href="{{ $category->shopLink() }}">
+                                            {{ $category->name }}
                                             @if ($category->subcategories->count())
-                                                <div class="dropdown-menu mega-dropdown fullwidth p-3">
-                                                    <div class="row">
-                                                        @foreach ($category->subcategories->chunk(ceil($category->subcategories->count() / 3)) as $chunk)
-                                                            <div class="col-md-4">
-                                                                <ul class="list-unstyled">
-                                                                    @foreach ($chunk as $subcategory)
-                                                                        <li class="position-relative group">
-                                                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{{ $subcategory->shopLink() ?? '#' }}">
-                                                                                {{ $subcategory->name }}
-                                                                                @if ($subcategory->allSubcategories->count())
-                                                                                    <i class="fas fa-angle-right"></i>
-                                                                                @endif
-                                                                            </a>
-                                                                            @if ($subcategory->allSubcategories->count())
-                                                                                <ul class="dropdown-menu sub-menu">
-                                                                                    @foreach ($subcategory->allSubcategories as $child)
-                                                                                        <li>
-                                                                                            <a class="dropdown-item" href="{{ $child->shopLink() ?? '#' }}">{{ $child->name }}</a>
-                                                                                        </li>
-                                                                                    @endforeach
-                                                                                </ul>
-                                                                            @endif
-                                                                        </li>
-                                                                    @endforeach
-                                                                </ul>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
+                                                <i class="fas fa-chevron-down ms-1 d-inline-block"></i>
                                             @endif
-                                        </li>
-                                    @endforeach
+                                        </a>
 
-                                    @if ($featuredCategories->count() > $mainMenuLimit)
-                                        <li class="nav-item dropdown position-static">
-                                            <a class="nav-link main-menu-link d-flex align-items-center justify-content-between" href="#" id="viewMoreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span>View More</span>
-                                                <i class="fas fa-chevron-down ms-1"></i>
-                                            </a>
-                                            <ul class="dropdown-menu p-2">
-                                                @foreach ($featuredCategories->slice($mainMenuLimit) as $category)
-                                                    <li>
-                                                        <a class="dropdown-item" href="{{ $category->shopLink() }}">{{ $category->name }}</a>
+                                        @if ($category->subcategories->count())
+                                            <ul class="sub-menu">
+                                                @foreach ($category->subcategories as $subcategory)
+                                                    <li class="menu-item">
+                                                        <a href="{{ $subcategory->shopLink() }}">
+                                                            {{ $subcategory->name }}
+                                                            @if ($subcategory->allSubcategories->count())
+                                                                <i class="fas fa-chevron-right ms-1 d-inline-block"></i>
+                                                            @endif
+                                                        </a>
+
+                                                        @if ($subcategory->allSubcategories->count())
+                                                            <ul class="sub-menu">
+                                                                @foreach ($subcategory->allSubcategories as $child)
+                                                                    <li class="menu-item">
+                                                                        <a href="{{ $child->shopLink() }}">{{ $child->name }}</a>
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @endif
                                                     </li>
                                                 @endforeach
                                             </ul>
-                                        </li>
-                                    @endif
-                                </ul>
-                            </div>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
-                    </nav>
-
-                </div>
+                    </div>
+                </nav>
             </div>
         </div>
     </div>
+</div>
+
 @endif
 
 @push('style')
-    <style>
-        .header-bottom {
-            background-color: #{{ $headerColor }};
-        }
+<style>
+.main-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
 
-        .main-menu-link {
-            position: relative;
-            padding: 10px 15px;
-            color: #fff;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
+.main-menu .menu-item {
+    position: relative;
+}
 
-        .main-menu-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-        }
-
-        .mega-dropdown.fullwidth {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: #fff;
-            z-index: 1050;
-            width: 100%;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-item.dropdown:hover > .mega-dropdown.fullwidth {
-            display: block;
-        }
-
-        /* .dropdown-menu.sub-menu {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 100%;
-            min-width: 220px;
-            background: #fff;
-            z-index: 1051;
-        }
-
-        li.position-relative:hover > .dropdown-menu.sub-menu {
-            display: block;
-        } */
-         
-
-        /* ...existing code... */
-        .dropdown-menu.sub-menu {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 100%;
-            min-width: 220px;
-            background: #fff;
-            z-index: 1051;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            padding: 0;
-        }
-
-        li.position-relative:hover > .dropdown-menu.sub-menu,
-        li.position-relative:focus-within > .dropdown-menu.sub-menu {
-            display: block;
-        }
-
-        li.position-relative {
-            position: relative;
-        }
-        /* ...existing code... */
+.main-menu .menu-item > a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    color:rgb(255, 255, 255);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+    background-color: #557DBF; /* Main menu background - blue */
+}
 
 
-        .dropdown-item {
-            font-size: 14px;
-            color: #333;
-            transition: all 0.3s;
-        }
+.menu-item .nav-item:hover > a {
+    background: #dd4637; 
+}
 
-        .dropdown-item:hover {
-            background-color: #f1f1f1;
-            color: #DA2128;
-        }
-    </style>
+/* Sub Menu */
+.sub-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    display: none;
+    z-index: 1000;
+}
+
+.menu-item:hover > .sub-menu {
+    display: block;
+    color: #dd4637; /* Red highlight on hover */
+}
+
+.sub-menu .menu-item {
+    position: relative;
+}
+
+.sub-menu a {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.sub-menu a:hover {
+    background: #f5f5f5;
+    color: #dd4637; /* Red highlight on hover */
+}
+
+.sub-menu .sub-menu {
+    top: 0;
+    left: 100%;
+    margin-left: 1px;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .main-menu {
+        flex-direction: column;
+        background-color: #557DBF; /* Mobile background - blue */
+    }
+
+    .main-menu .menu-item > a {
+        color: #fff;
+        padding: 10px 16px;
+    }
+
+    .sub-menu {
+        position: static;
+        box-shadow: none;
+        background: #f2f2f2;
+        display: none;
+    }
+
+    .menu-item:hover > .sub-menu {
+        display: block;
+    }
+
+    .sub-menu a {
+        color: #333;
+    }
+
+    .sub-menu a:hover {
+        background: #ddd;
+        color: #dd4637;
+    }
+
+    .sub-menu .sub-menu {
+        margin-left: 15px;
+        position: static;
+    }
+}
+</style>
 @endpush

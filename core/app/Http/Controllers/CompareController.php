@@ -23,9 +23,9 @@ class CompareController extends Controller {
             return response()->json(['error' => 'Product not found']);
         }
 
-        if (!$product->product_type_id) {
-            return response()->json(['error' => 'This product cannot be added to the comparison list']);
-        }
+        // if (!$product->product_type_id) {
+        //     return response()->json(['error' => 'This product cannot be added to the comparison list']);
+        // }
 
         $compare = session('compare', []);
 

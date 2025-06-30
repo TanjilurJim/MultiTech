@@ -62,6 +62,17 @@
             "modal": true
         }
     },
+    "text_content": {
+        "page": "home",
+        "builder": true,
+        "name": "Text Content",
+        "element": {
+            "title": "text",
+            "description": "",
+            "modal": true
+        }
+    },
+    
 
     
     "top_selling_products": {
