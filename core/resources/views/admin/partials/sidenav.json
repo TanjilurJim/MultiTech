@@ -118,57 +118,7 @@
         ]
     },
 
-    "customer_database": {
-        "title": "Customer Database",
-        "icon": "las la-address-book", 
-        "menu_active": "admin.customers*",
-        "submenu": [
-            {
-                "keyword": [
-                    "customer database",
-                    "customers",
-                    "crm",
-                    "contact list"
-                ],
-                "title": "Database",
-                "route_name": "admin.customers.index",
-                "menu_active": "admin.customers.index"
-            },
-            {
-                "keyword": [
-                    "follow up",
-                    "follow-up report",
-                    "customer follow up",
-                    "crm"
-                ],
-                "title": "Follow-Up Report Log",
-                "route_name": "admin.followups.index",
-                "menu_active": "admin.followups.index"
-            },
-            {
-                "keyword": [
-                    "follow up",
-                    "follow-up report",
-                    "customer follow up",
-                    "crm"
-                ],
-                "title": "Follow-Up Report ",
-                "route_name": "admin.followups.report",
-                "menu_active": "admin.followups.report"
-            },
-            {
-                "keyword": [
-                    "follow up",
-                    "follow-up report",
-                    "customer follow up",
-                    "crm"
-                ],
-                "title": "Follow-Up Summaries ",
-                "route_name": "admin.followups.summaries",
-                "menu_active": "admin.followups.summaries"
-            }
-        ]
-    },
+    
     "product_config": {
         "title": "Product Config",
         "icon": "lab la-dropbox",

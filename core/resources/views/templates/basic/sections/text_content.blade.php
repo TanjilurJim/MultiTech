@@ -34,7 +34,9 @@
     color: #2d2d2d !important;
     margin-bottom: 15px !important;
     line-height: 1.3 !important;
-    width: min-content !important;
+    max-width: 100% !important;
+    word-break: break-word !important;
+    white-space: normal !important;
 }
 
 /* Description styling */
@@ -42,7 +44,9 @@
     font-size: 16px !important;
     color: #555 !important;
     line-height: 1.8 !important;
-    width: max-content !important;
+    max-width: 100% !important;
+    word-break: break-word !important;
+    white-space: normal !important;
 }
 
 /* Each content item spacing */
@@ -65,4 +69,7 @@
         font-size: 14px !important;
     }
 }
+
 </style>
+
+

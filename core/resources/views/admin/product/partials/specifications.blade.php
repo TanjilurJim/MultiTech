@@ -10,7 +10,7 @@
                 <label>@lang('Specify')</label>
             </div>
             <div class="col-md-9">
-                <textarea rows="5" class="form-control" name="specify">{{ $product->specify ?? '' }}</textarea>
+                <textarea rows="5" class="form-control" name="specify" id="specifyField">{{ $product->specify ?? '' }}</textarea>
             </div>
         </div>
         <!-- <div class="select2-parent d-flex flex-wrap">
@@ -18,15 +18,34 @@
             <select class="form-control w-auto flex-grow-1" name="product_type_id">
                 <option value="">@lang('Select One')</option>
                 @foreach ($productTypes as $productType)
-                    <option value="{{ @$productType->id }}" data-specifications='@json($productType->specifications)' @selected($productType->id == @$product->product_type_id)>{{ __($productType->name) }}</option>
-                @endforeach
+<option value="{{ @$productType->id }}" data-specifications='@json($productType->specifications)' @selected($productType->id == @$product->product_type_id)>{{ __($productType->name) }}</option>
+@endforeach
             </select>
         </div> -->
     </div>
 </div>
 <div class="specifications-wrapper row gy-4"></div>
 
+@push('script')
+    {{-- TinyMCE core --}}
+    <script src="https://unpkg.com/tinymce@5.3.0/tinymce.min.js"></script>
 
+    {{-- TinyMCE + FontAwesome picker init --}}
+    <script>
+        tinymce.init({
+            selector: '#specifyField', // ← only this textarea
+            plugins: 'fontawesomepicker advlist autolink lists link image charmap print preview hr anchor pagebreak accordion autoresize code codesample directionality fullscreen emoticons help quickbars table',
+            toolbar: 'fontawesomepicker forecolor backcolor fontsizeselect formatselect | bullist numlist | bold italic underline | link image | code',
+            fontsize_formats: '12px 14px 16px 18px 24px 36px',
+            external_plugins: {
+                fontawesomepicker: 'https://www.unpkg.com/tinymce-fontawesomepicker/fontawesomepicker/plugin.min.js'
+            },
+            fontawesomeUrl: 'https://www.unpkg.com/@fortawesome/fontawesome-free@5.14.0/css/all.min.css',
+            height: 300,
+            menubar: false
+        });
+    </script>
+@endpush
 @push('script')
     <script>
         (function($) {
@@ -61,16 +80,20 @@
                     let index = 0;
                     specifications.forEach((specification, i) => {
                         const specificationGroup = buildSpecificationGroup(specification.group_name);
-                        const groupElement = appendAndShowElement($(specificationsWrapper), specificationGroup, false);
+                        const groupElement = appendAndShowElement($(specificationsWrapper),
+                            specificationGroup, false);
 
                         specification.attributes.forEach((attribute => {
                             let value = '';
                             if (specificationValues.length > 0) {
-                                const specificationItem = specificationValues.find(item => item.key === attribute);
-                                value = specificationItem && specificationItem.value ? specificationItem.value : '';
+                                const specificationItem = specificationValues.find(item => item
+                                    .key === attribute);
+                                value = specificationItem && specificationItem.value ?
+                                    specificationItem.value : '';
                             }
                             const content = buildSpecificationHTML(attribute, index, value);
-                            appendAndShowElement($(groupElement).find('.card-body'), content, false);
+                            appendAndShowElement($(groupElement).find('.card-body'), content,
+                                false);
                             index++;
                         }));
                     });

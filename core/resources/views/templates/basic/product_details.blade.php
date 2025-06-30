@@ -28,7 +28,7 @@
 
                                     @if ($product->specify)
                                         <li class="nav-item">
-                                            <a href="#specify" class="nav-link" data-bs-toggle="tab">@lang('Specify')</a>
+                                            <a href="#specify" class="nav-link" data-bs-toggle="tab">@lang('Specification')</a>
                                         </li>
                                     @endif
 
@@ -53,7 +53,7 @@
 
                                     @if ($product->specify)
                                         <li class="nav-item flex-fill">
-                                            <a href="#specify" class="nav-link" data-bs-toggle="tab">@lang('Specify')</a>
+                                            <a href="#specify" class="nav-link" data-bs-toggle="tab">@lang('Specification')</a>
                                         </li>
                                     @endif
 
@@ -175,7 +175,7 @@
                                     @if ($product->specify) <!-- Specify Tab -->
                                         <div class="tab-pane fade" id="specify">
                                             <div class="specification-wrapper">
-                                                <h6 class="mb-2">@lang('Specify')</h6>
+                                                {{-- <h6 class="mb-2">@lang('Specify')</h6> --}}
                                                 <div class="specification-item">
                                                     @php echo $product->specify @endphp
                                                 </div>

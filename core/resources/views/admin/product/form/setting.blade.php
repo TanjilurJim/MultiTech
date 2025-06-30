@@ -136,12 +136,16 @@
             border-radius: 8px;
         }
     </style>
+    
 @endpush
 
 @push('script')
     <script>
         (function($) {
             'use strict';
+            
+            
+
             const generateSkuBtn = $('#generateSkuBtn');
             const skuField = $('#skuField');
             const form = $('#productForm');
@@ -228,9 +232,12 @@
             }
 
             const updateTextareaContent = () => {
+
+                if (window.tinymce) tinymce.triggerSave();
                 const textareaField = 'productDescription';
 
                 saveNicContent(textareaField);
+                
 
                 let extraDescriptionFields = $(document).find('.extra_description-field');
                 if (extraDescriptionFields.length > 0) {

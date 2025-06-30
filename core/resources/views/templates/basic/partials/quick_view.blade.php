@@ -296,7 +296,7 @@
                 @if (gs('product_wishlist'))
                     <button class="add-to-wishlist-btn @if (checkWishList($product->id)) active @endif addToWishlist"
                         data-id="{{ $product->id }}">
-                        <span class="wish-icon"></span> @lang('Wishlist')
+                        <span class="wish-icon"></span> <i class="las la-heart"></i>
                     </button>
                 @endif
 

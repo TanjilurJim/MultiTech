@@ -94,3 +94,5 @@ class CompareController extends Controller {
         return back()->withNotify($notify);
     }
 }
+
+
