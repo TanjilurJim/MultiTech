@@ -12,19 +12,29 @@ class FollowUpReportController extends Controller
 {
     public function monthly(Request $request)
     {
+        $admin      = auth('admin')->user();
         $rangeStart = now()->subDays(30)->startOfDay();
 
-        $base = FollowUpLog::where('contact_date', '>=', now()->subDays(30))
-            ->where('admin_id', auth('admin')->id())   // <— just this
+        /* -----------------------------------------------------------------
+           1. Build base query that respects visibility
+        ----------------------------------------------------------------- */
+        $base = FollowUpLog::visibleTo($admin)          // super-admin → all logs
+            ->where('contact_date', '>=', $rangeStart)
             ->with('admin:id,name');
 
-        /* ---- company-wide totals ---- */
+        /* -----------------------------------------------------------------
+           2. Company-wide (or scope-wide) totals
+        ----------------------------------------------------------------- */
         $stats = (clone $base)->selectRaw('
-                    SUM(customers_contacted)  AS contacted,
-                    SUM(potential_customers)  AS potential
+                     SUM(customers_contacted)  AS contacted,
+                     SUM(potential_customers)  AS potential
                  ')->first();
 
-        /* ---- per-admin breakdown ---- */
+        /* -----------------------------------------------------------------
+           3. Per-admin breakdown
+                 – If super-admin or view_all → might include many admins
+                 – Else   → probably just one (themselves)
+        ----------------------------------------------------------------- */
         $summaries = (clone $base)->groupBy('admin_id')
             ->select('admin_id')
             ->selectRaw('SUM(customers_contacted) contacted,
@@ -32,7 +42,9 @@ class FollowUpReportController extends Controller
             ->with('admin:id,name')
             ->get();
 
-        /* ---- Excel download ---- */
+        /* -----------------------------------------------------------------
+           4. Excel download?  Same subset
+        ----------------------------------------------------------------- */
         if ($request->boolean('download')) {
             return Excel::download(
                 new MonthlyReportExport($summaries, $stats),

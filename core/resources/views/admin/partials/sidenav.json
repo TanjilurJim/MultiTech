@@ -41,7 +41,8 @@
                 ],
                 "title": "Database",
                 "route_name": "admin.customers.index",
-                "menu_active": "admin.customers.index"
+                "menu_active": "admin.customers.index",
+                "permission": "customers.view"
             },
             {
                 "keyword": [
@@ -50,9 +51,10 @@
                     "customer follow up",
                     "crm"
                 ],
-                "title": "Follow-Up Report Log",
+                "title": "Follow-Up Input Form",
                 "route_name": "admin.followups.index",
-                "menu_active": "admin.followups.index"
+                "menu_active": "admin.followups.index",
+                "permission": "followup_logs.view"
             },
             {
                 "keyword": [
@@ -63,7 +65,8 @@
                 ],
                 "title": "Follow-Up Report ",
                 "route_name": "admin.followups.report",
-                "menu_active": "admin.followups.report"
+                "menu_active": "admin.followups.report",
+                "permission": "followup_reports.view"
             },
             {
                 "keyword": [
@@ -74,7 +77,8 @@
                 ],
                 "title": "Follow-Up Summaries ",
                 "route_name": "admin.followups.summaries",
-                "menu_active": "admin.followups.summaries"
+                "menu_active": "admin.followups.summaries",
+                "permission": "followup_summaries.view"
             }
         ]
     },
@@ -82,24 +86,28 @@
         "title": "Access Control",
         "icon": "las la-user-shield",
         "menu_active": "admin.roles*|admin.permissions*",
+        "permission": "roles.view|permissions.view|users.view",
         "submenu": [
             {
                 "keyword": ["roles", "access control", "acl", "security"],
                 "title": "Roles",
                 "route_name": "admin.roles.index",
-                "menu_active": "admin.roles.index"
+                "menu_active": "admin.roles.index",
+                "permission": "roles.view"
             },
             {
                 "keyword": ["permissions", "access control", "acl", "security"],
                 "title": "Permissions",
                 "route_name": "admin.permissions.index",
-                "menu_active": "admin.permissions.index"
+                "menu_active": "admin.permissions.index",
+                "permission": "permissions.view"
             },
             {
                 "keyword": ["users", "access control", "acl", "security"],
                 "title": "Users",
                 "route_name": "admin.admin-users.index",
-                "menu_active": "admin.admin-users.index"
+                "menu_active": "admin.admin-users.index",
+                "permission": "admin_users.view"
             }
             
         ]

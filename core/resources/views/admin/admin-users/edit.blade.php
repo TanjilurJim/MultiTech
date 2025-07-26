@@ -1,11 +1,18 @@
 @extends('admin.layouts.app')
-@include('components.flash-toast')
-@section('panel')
-    <h5 class="mb-3">Edit Admin: {{ $admin->username }}</h5>
 
-    <form action="{{ route('admin.admin-users.update',$admin) }}" method="POST" class="card p-4">
-        @method('PUT')
-        @include('admin.admin-users._form')
-        <button class="btn btn-primary">Update</button>
-    </form>
+@section('panel')
+    <h4 class="mb-4 fw-semibold">
+        <i class="las la-user-edit me-1"></i> Edit Admin — {{ $admin->username }}
+    </h4>
+
+    <div class="card p-4 shadow-sm">
+        <form action="{{ route('admin.admin-users.update',$admin) }}" method="POST">
+            @method('PUT')
+            @include('admin.admin-users._form')
+            <br>
+            <button class="btn btn-primary">
+                <i class="las la-sync-alt me-1"></i> Update
+            </button>
+        </form>
+    </div>
 @endsection

@@ -25,7 +25,7 @@
                     <h2 class="title"> @lang('PAGE NOT FOUND')</h2>
                     <p class="description">@lang('The page you are looking for doesn\'t exist or an other error ocurred or temporarily unavailable.')</p>
 
-                    <a href="{{ route('home') }}" class="cmn-btn mt-4">
+                    {{-- <a href="{{ route('/') }}" class="cmn-btn mt-4"> --}}
                         <span class="icon">
                             <svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 483.1 483.1" xml:space="preserve">
                                 <g>

@@ -1,9 +1,15 @@
 @extends('admin.layouts.app')
 
 @section('panel')
+
 <div class="card shadow-sm">
-    <div class="card-header">
+    
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Add Daily Follow-Up</h5>
+        <a href="{{ route('admin.followups.index') }}" class="btn btn--sm btn--primary">
+        <i class="la la-arrow-left"></i> Back to List
+    </a>
+        
     </div>
 
     <div class="card-body">

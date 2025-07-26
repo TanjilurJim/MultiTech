@@ -7,7 +7,8 @@ use App\Http\Controllers\GuestOrderController;
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
-Route::redirect('/', '/admin')->name('home.redirect');
+Route::redirect('/', '/admin')->name('home');
+
 
 
 // User Support Ticket

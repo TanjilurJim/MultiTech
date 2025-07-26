@@ -11,7 +11,7 @@ class PermissionController extends Controller
 {
     public function index()
     {
-        $perms = Permission::whereGuardName('admin')->paginate(30);
+        $perms = Permission::whereGuardName('admin')->paginate(10);
         $pageTitle = 'Permissions';
         return view('admin.permissions.index', compact('perms', 'pageTitle'));
     }

@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Lib\CurlRequest;
 use App\Models\AdminNotification;
 use App\Models\Deposit;
+use App\Models\Customer;
+use App\Models\FollowUpLog;
+use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\SupportTicket;
@@ -23,53 +26,94 @@ class AdminController extends Controller
     public function dashboard()
     {
         $pageTitle = 'Dashboard';
-        $widget['total_product']            = Product::whereHas('categories')->count();
+        $admin     = auth('admin')->user();
 
-        $widget['orders']['total_orders']      = ['color' => 'bg--dark', 'count' => Order::isValidOrder()->count(), 'route' => 'admin.order.index'];
-        $widget['orders']['pending_orders']    = ['color' => 'bg--warning', 'count' => Order::isValidOrder()->pending()->count(), 'route' => 'admin.order.pending'];
-        $widget['orders']['processing_orders'] = ['color' => 'bg--info', 'count' => Order::isValidOrder()->processing()->count(), 'route' => 'admin.order.processing'];
-        $widget['orders']['dispatched_orders'] = ['color' => 'bg--primary', 'count' => Order::isValidOrder()->dispatched()->count(), 'route' => 'admin.order.dispatched'];
-        $widget['orders']['delivered_orders']  = ['color' => 'bg--success', 'count' => Order::isValidOrder()->delivered()->count(), 'route' => 'admin.order.delivered'];
-        $widget['orders']['canceled_orders']   = ['color' => 'bg--danger', 'count' => Order::isValidOrder()->canceled()->count(), 'route' => 'admin.order.canceled'];
+        /* ---------------------------------------------------------------
+       Helper: apply scopeVisibleTo() unless super-admin
+    ----------------------------------------------------------------*/
+        $scope = function ($builder) use ($admin) {
+            if ($admin->hasRole('super-admin')) {
+                return $builder;
+            }
+            return method_exists($builder->getModel(), 'scopeVisibleTo')
+                ? $builder->visibleTo($admin)
+                : $builder->where('admin_id', $admin->id);
+        };
 
-        $widget['total_users']             = User::count();
-        $widget['active_users']            = User::active()->count();
-        $widget['profile_completed']       = User::profileCompleted()->count();
-        $widget['banned_users']            = User::banned()->count();
-        $widget['mobile_unverified_users'] = User::mobileUnverified()->count();
-        $widget['email_unverified_users']  = User::emailUnverified()->count();
+        /* ---------------------------------------------------------------
+       MAIN WIDGET COUNTS
+    ----------------------------------------------------------------*/
+        // Customers & follow-ups (30 days)
+        $widget['customers']    = Customer::visibleTo($admin)->count();
+        $widget['followups_30'] = FollowUpLog::visibleTo($admin)
+            ->where('contact_date', '>=', now()->subDays(30))
+            ->count();
 
-        $widget['pending_tickets']         =  SupportTicket::pending()->count();
-        $widget['low_stock_products']      =  Product::lowStock()->count();
-        $widget['out_of_stock_products']   =  Product::outOfStock()->count();
+        
 
+        // Order widgets
+        
 
-        // user Browsing, Country, Operating Log
-        $userLoginData = UserLogin::where('created_at', '>=', Carbon::now()->subDays(30))->get(['browser', 'os', 'country']);
+        // Super-admin-only user widgets
+        if ($admin->hasRole('super-admin')) {
+            $widget['total_users']   = Admin::count();
+            
+        }
 
-        $chart['user_browser_counter'] = $userLoginData->groupBy('browser')->map(function ($item, $key) {
-            return collect($item)->count();
-        });
+        /* ---------------------------------------------------------------
+       KPI ARRAY  (build AFTER widgets exist)
+    ----------------------------------------------------------------*/
+        $kpis = [
+            $widget['customers'],                       // Customers
+            $widget['followups_30'],                    // Follow-Ups 30 d
+           
+            $admin->hasRole('super-admin') ? $widget['total_users'] ?? null : null
+        ];
 
-        $chart['user_os_counter'] = $userLoginData->groupBy('os')->map(function ($item, $key) {
-            return collect($item)->count();
-        });
+        /* ---------------------------------------------------------------
+       LATEST FOLLOW-UPS & TOP PERFORMERS
+    ----------------------------------------------------------------*/
+        $latestFollowUps = FollowUpLog::with('admin:id,name')
+            ->visibleTo($admin)
+            ->latest('contact_date')
+            ->limit(6)
+            ->get();
 
-        $chart['user_country_counter'] = $userLoginData->groupBy('country')->map(function ($item, $key) {
-            return collect($item)->count();
-        })->sort()->reverse()->take(5);
+        $topPerformers = $admin->hasRole('super-admin')
+            ? FollowUpLog::where('contact_date', '>=', now()->subDays(30))
+            ->selectRaw('admin_id, SUM(customers_contacted) AS total')
+            ->groupBy('admin_id')
+            ->with('admin:id,name')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get()
+            : collect();
 
+        /* ---------------------------------------------------------------
+       Everything else (pie charts, deposits, top–selling products)
+    ----------------------------------------------------------------*/
+        
 
-        $deposit['total_deposit_amount']        = Deposit::successful()->sum('amount');
-        $deposit['total_deposit_pending']       = Deposit::pending()->count();
-        $deposit['total_deposit_rejected']      = Deposit::rejected()->count();
-        $deposit['total_deposit_charge']        = Deposit::successful()->sum('charge');
+       
 
-        $topSellingProducts    = Product::topSales(3);
-        $latestUser            = User::with('orders')->orderBy('id', 'desc')->take(6)->get();
-        $recentOrders          = Order::isValidOrder()->with('user')->orderBy('id', 'desc')->take(6)->get();
+        
+        
 
-        return view('admin.dashboard', compact('pageTitle', 'widget', 'chart', 'deposit', 'topSellingProducts', 'latestUser', 'recentOrders'));
+        /* ---------------------------------------------------------------
+       RETURN VIEW
+    ----------------------------------------------------------------*/
+        return view('admin.dashboard', compact(
+            'pageTitle',
+            'widget',
+            'kpis',           // ← NOW passed
+            
+       
+          
+            
+           
+            'latestFollowUps',
+            'topPerformers'
+        ));
     }
 
 

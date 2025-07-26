@@ -10,13 +10,14 @@ class FollowUpLogController extends Controller
 {
     public function index()
     {
+        $admin = auth('admin')->user();
+
         $logs = FollowUpLog::with('admin')
-            ->where('admin_id', auth('admin')->id())
+            ->visibleTo($admin)                 // ← single source of truth
             ->latest('contact_date')
             ->paginate(15);
 
         $pageTitle = 'Follow-up Logs';
-
         return view('admin.followups.index', compact('logs', 'pageTitle'));
     }
 

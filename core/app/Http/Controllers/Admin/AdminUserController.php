@@ -18,25 +18,45 @@ class AdminUserController extends Controller
     }
 
     /* ------------ READ ------------ */
-    public function index()
+    public function index(Request $request)
     {
-        $pageTitle = 'All User';
-        $admins = Admin::with(['roles', 'permissions'])
-            ->latest()
-            ->paginate(20);
+        $search = $request->input('q');           // query-string ?q=
 
-        return view('admin.admin-users.index', compact('admins', 'pageTitle'));
+        $admins = Admin::withoutGlobalScope('onlyActive')
+        ->with(['roles', 'permissions', 'creator'])
+        
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('name',  'like', "%{$search}%")
+                        ->orWhere('email',    'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->filled('status'), function ($q) use ($request) {
+                // ?status=active / inactive
+                $q->where('is_active', $request->status === 'active');
+            })
+            ->latest()
+            ->paginate(7)
+            ->withQueryString();                  // keep ?q on page links
+
+        $pageTitle = 'Admin Users';
+        return view('admin.admin-users.index', compact('admins', 'pageTitle', 'search'));
     }
 
     /* ------------ CREATE ------------ */
     public function create()
     {
         $pageTitle = 'User Create';
+
+        $locationData = getBangladeshLocationData();
+
         return view(
             'admin.admin-users.create',
             [
-                'roles'  => Role::whereGuardName('admin')->get(),
-                'perms'  => Permission::whereGuardName('admin')->get(),
+                'roles' => Role::whereGuardName('admin')->pluck('name')->toArray(),
+                'perms' => Permission::whereGuardName('admin')->pluck('name')->toArray(),
+                'locationData' => $locationData,
             ],
             compact('pageTitle')
         );
@@ -51,40 +71,56 @@ class AdminUserController extends Controller
             'password'    => 'required|min:6|confirmed',
 
             'roles'        => ['array'],
-            'roles.*'      => Rule::exists('roles', 'id')->where('guard_name', 'admin'),
+            'roles.*'      => Rule::exists('roles', 'name')->where('guard_name', 'admin'),
 
             'permissions'  => ['array'],
-            'permissions.*' => Rule::exists('permissions', 'id')->where('guard_name', 'admin'),
+            'permissions.*' => Rule::exists('permissions', 'name')->where('guard_name', 'admin'),
+            'is_active'   => ['sometimes', 'boolean'],
         ]);
 
         $admin = Admin::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
             'username' => $data['username'],
-            'password' => bcrypt($data['password']),
+            'password' => $data['password'],
+            'created_by'  => auth('admin')->id(),
+            'is_active'   => $data['is_active'] ?? true,
         ]);
 
-        /* 🔸 convert posted IDs → Role / Permission models */
-        $roleModels = Role::whereIn('id', $data['roles']        ?? [])->get();
-        $permModels = Permission::whereIn('id', $data['permissions'] ?? [])->get();
+        $admin->syncRoles($data['roles'] ?? []);
+        $admin->syncPermissions($data['permissions'] ?? []);
 
-        $admin->syncRoles($roleModels);
-        $admin->syncPermissions($permModels);
+        // dd($r->areas, $r->all());
+
+        // 🔥 save area assignments
+        foreach ($r->areas ?? [] as $area) {
+            $admin->areaAssignments()->create([
+                'division_id' => $area['division_id'],
+                'district_id' => $area['district_id'] ?? null,
+                'area_name'   => $area['area_name'] ?? null,
+            ]);
+        }
 
         return to_route('admin.admin-users.index')
             ->withSuccess('Admin user created');
     }
 
+
     /* ------------ UPDATE ------------ */
     public function edit(Admin $admin)
     {
+        $pageTitle = 'edit';
+        $locationData = getBangladeshLocationData();
         return view(
             'admin.admin-users.edit',
             [
+
                 'admin' => $admin->load(['roles', 'permissions']),
-                'roles' => Role::whereGuardName('admin')->get(),
-                'perms' => Permission::whereGuardName('admin')->get(),
-            ]
+                'roles' => Role::whereGuardName('admin')->pluck('name')->toArray(),
+                'perms' => Permission::whereGuardName('admin')->pluck('name')->toArray(),
+                'locationData' => $locationData,
+            ],
+            compact('pageTitle')
         );
     }
 
@@ -107,27 +143,44 @@ class AdminUserController extends Controller
             'password' => 'nullable|min:6|confirmed',
 
             'roles'        => ['array'],
-            'roles.*'      => Rule::exists('roles', 'id')->where('guard_name', 'admin'),
+            'roles.*'      => Rule::exists('roles', 'name')->where('guard_name', 'admin'),
             'permissions'  => ['array'],
-            'permissions.*' => Rule::exists('permissions', 'id')->where('guard_name', 'admin'),
+            'permissions.*' => Rule::exists('permissions', 'name')->where('guard_name', 'admin'),
+            'is_active'   => ['sometimes', 'boolean'],
         ]);
 
-        // ─── basic fields ──────────────────────────────────────────────────────
-        $admin->update(collect($data)->only('name', 'email', 'username')->toArray());
+        $admin->update(collect($data)->only('name', 'email', 'username', 'is_active')->toArray());
 
         if (filled($data['password'] ?? null)) {
-            $admin->update(['password' => bcrypt($data['password'])]);
+            $admin->update(['password' => $data['password']]);
         }
 
-        // ─── convert the posted IDs to real models (or role names) ────────────
-        $roleModels = Role::whereIn('id', $data['roles']        ?? [])->get();
-        $permModels = Permission::whereIn('id', $data['permissions'] ?? [])->get();
+        $admin->syncRoles($data['roles'] ?? []);
+        $admin->syncPermissions($data['permissions'] ?? []);
 
-        $admin->syncRoles($roleModels);        // ← no “RoleDoesNotExist” anymore
-        $admin->syncPermissions($permModels);
+        // 🔥 save area assignments
+        $admin->areaAssignments()->delete();
+        foreach ($r->areas ?? [] as $area) {
 
-        return back()->withSuccess('Admin user updated');
+            // ① ignore anything that isn’t a proper array OR has no division
+            if (!is_array($area) || empty($area['division_id'])) {
+                continue;
+            }
+
+            $admin->areaAssignments()->create([
+                'division_id' => $area['division_id'],
+                'district_id' => $area['district_id'] ?? null,
+                'area_name'   => $area['area_name']   ?? null,
+            ]);
+        }
+
+        // return back()->withSuccess('Admin user updated');
+
+        return redirect()
+            ->route('admin.admin-users.index')
+            ->with('success', 'Admin User Updated');
     }
+
 
     /* ------------ DELETE ------------ */
     public function destroy(Admin $admin)
@@ -136,5 +189,18 @@ class AdminUserController extends Controller
         $admin->delete();
 
         return back()->withSuccess('Admin user removed');
+    }
+
+    public function deactivate(Admin $admin)
+    {
+        $admin->update(['is_active' => false]);
+        return back()->withSuccess('User disabled');
+    }
+
+    /** PUT admin-users/{admin}/activate */
+    public function activate(Admin $admin)
+    {
+        $admin->update(['is_active' => true]);
+        return back()->withSuccess('User enabled');
     }
 }

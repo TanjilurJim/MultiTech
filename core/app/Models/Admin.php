@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\AdminAreaAssignment;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -19,7 +20,9 @@ class Admin extends Authenticatable
         'email',
         'username',
         'password',
-        'image',          // add others if you ever save them via create()/update()
+        'image',
+        'is_active',
+        'created_by',         // add others if you ever save them via create()/update()
     ];
 
     // --- Option B: open everything --------------------------
@@ -29,6 +32,9 @@ class Admin extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /** Auto–hash when we set `password` */
@@ -44,4 +50,21 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(\App\Models\FollowUpLog::class);
     }
+
+    public function areaAssignments()
+    {
+        return $this->hasMany(AdminAreaAssignment::class, 'admin_id');
+    }
+    public function scopeActive($q)
+    {
+        return $q->where('is_active', true);
+    }
+
+    /* who created this admin */
+    public function creator()
+    {
+        return $this->belongsTo(Admin::class, 'created_by');
+    }
+
+    
 }

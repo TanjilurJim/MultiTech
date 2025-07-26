@@ -7,29 +7,136 @@ use App\Models\Customer;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CustomerExport;
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Validation\Rule;
 
 class CustomerController extends Controller
 {
     //
+    use AuthorizesRequests;
+
+    /**
+     * Allowed customer types.
+     */
+    public const TYPES = [
+        'Wholesale',
+        'Project',
+        'Online',
+        // Add more types as needed
+    ];
+
+    public function __construct()
+    {
+        /*
+         * One closure-based middleware for the whole controller:
+         *   – maps the current action name to the correct policy ability
+         *   – runs $this->authorize(...) for you
+         */
+        $this->middleware(function ($request, $next) {
+            $method  = $request->route()->getActionMethod();   // e.g. index, show, update …
+            $ability = $this->abilityMap()[$method] ?? null;   // e.g. viewAny, view, update …
+
+            if ($ability) {
+                // If the route contains {customer} → get the model instance
+                $model = $request->route('customer');
+
+                // viewAny receives only the class name
+                $subject = $ability === 'viewAny' ? Customer::class : $model;
+
+                $this->authorize($ability, $subject);
+            }
+
+            return $next($request);
+        });
+    }
+
+    /**
+     * Map controller method ➜ policy ability.
+     * Same defaults Laravel uses internally.
+     */
+    protected function abilityMap(): array
+    {
+        return [
+            'index'   => 'viewAny',
+            'show'    => 'view',
+            'edit'    => 'update',
+            'update'  => 'update',
+            'destroy' => 'delete',
+            // add more if you create store/create etc.
+        ];
+    }
+
 
     public function index(Request $request)
     {
-        $query = Customer::query();
+        $bd = getBangladeshLocationData(); 
+        $query = Customer::visibleTo(auth('admin')->user())
+        ->with('creator');
 
-        // simple search/filter
+        // search/filter
         if ($term = $request->query('q')) {
-            $query->where(fn($q) => $q
-                ->where('name', 'like', "%$term%")
-                ->orWhere('company', 'like', "%$term%")
-                ->orWhere('contact_number', 'like', "%$term%"));
+            $query->where(function ($q) use ($term, $bd) {
+                // existing clauses …
+                $q->where('name', 'like', "%$term%")
+                    ->orWhere('company', 'like', "%$term%")
+                    ->orWhere('contact_number', 'like', "%$term%");
+
+                // NEW – match division / district / area names
+                $divIds = collect($bd['divisions'])
+                    ->filter(fn($d) => str_contains(strtolower($d['name']), strtolower($term)))
+                    ->pluck('id');
+                $disIds = collect($bd['districts'])
+                    ->filter(fn($d) => str_contains(strtolower($d['name']), strtolower($term)))
+                    ->pluck('id');
+
+                if ($divIds->isNotEmpty())  $q->orWhereIn('division_id', $divIds);
+                if ($disIds->isNotEmpty())  $q->orWhereIn('district_id', $disIds);
+
+                // plain string match for area_name (Elephant Road, etc.)
+                $q->orWhere('area_name', 'like', "%$term%");
+            });
         }
+
+        // type filter ---------------------------------------------------
+        if ($type = $request->query('type')) {
+            // silent‑fail if an invalid value is passed
+            if (in_array($type, self::TYPES, true)) {
+                $query->where('customer_type', $type);
+            }
+        }
+
+        // location filters (division → district → area)
+        // -----------------------------------------------------------------
+        if ($div = $request->query('division_id')) {
+            $query->where('division_id', $div);
+        }
+
+        if ($dis = $request->query('district_id')) {
+            $query->where('district_id', $dis);
+        }
+
+        if ($area = $request->query('area_name')) {
+            $query->where('area_name', $area);
+        }
+
         $pageTitle = 'Customer Database';
 
-        $customers = $query->latest()->paginate(7)->withQueryString();
+        $customers = $query->latest()
+            ->paginate(7)
+            ->appends($request->only(['q', 'type', 'division_id', 'district_id', 'area_name']));
 
-        return view('admin.customers.index', compact('customers', 'term', 'pageTitle'));
+        $bd        = getBangladeshLocationData();          // ① send to view
+        $term      = $term ?? null;                        // keep old vars
+
+        return view('admin.customers.index', compact(
+            'customers',
+            'term',
+            'type',
+            'bd',                                           // new
+            'pageTitle'
+        ));
     }
+
 
     public function edit(Customer $customer)
     {
@@ -41,7 +148,7 @@ class CustomerController extends Controller
             true
         )['postcodes'];
 
-        return view('admin.customers.edit', compact('customer', 'bd', 'postcodes','pageTitle'));
+        return view('admin.customers.edit', compact('customer', 'bd', 'postcodes', 'pageTitle'));
     }
 
     public function show(Customer $customer)
@@ -66,10 +173,14 @@ class CustomerController extends Controller
             // 'thana_id'       => 'required',
             'area_name' => 'required|string',
             'postcode'       => 'nullable|string',
+            'customer_type'  => ['required', Rule::in(['Wholesale', 'Project', 'Online'])],
             'remarks'        => 'nullable|string',
         ]);
 
-        Customer::create($data);
+        Customer::create($data + [
+        'customer_type' => $data['customer_type'] ?? 'Wholesale',
+        'created_by'    => auth('admin')->id(),
+    ]);
         return back()->with('success', 'Customer added.');
     }
 
@@ -85,13 +196,14 @@ class CustomerController extends Controller
             // 'thana_id'       => 'required',
             'area_name' => 'required|string',
             'postcode'       => 'nullable|string',
+            'customer_type'  => ['required', Rule::in(['Wholesale', 'Project', 'Online'])],
             'remarks'        => 'nullable|string',
         ]);
 
         $customer->update($data);
 
         return redirect()->route('admin.customers.index')
-                     ->with('success', 'Customer updated.');
+            ->with('success', 'Customer updated.');
     }
 
     public function destroy(Customer $customer)
@@ -102,6 +214,7 @@ class CustomerController extends Controller
 
     public function export()
     {
-        return Excel::download(new CustomerExport, 'customers.xlsx');
+        $admin = auth('admin')->user();
+        return Excel::download(new CustomerExport($admin), 'customers.xlsx');
     }
 }

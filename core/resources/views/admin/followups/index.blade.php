@@ -3,9 +3,11 @@
 @section('panel')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">Daily Follow-Up Logs</h5>
+        @can('followup_logs.add')
         <a href="{{ route('admin.followups.create') }}" class="btn btn-sm btn-primary">
             + Add New
         </a>
+        @endcan
     </div>
 
     <div class="card shadow-sm">
@@ -32,13 +34,20 @@
                             </td>
                             <td>{{ $log->admin->name }}</td>
                             {{-- VIEW button --}}
+
                             <td class="text-end">
+                                @can('followup_logs.view')
                                 <a href="{{ route('admin.followups.show', $log) }}" class="btn btn-sm btn-outline-primary">
                                     View
                                 </a>
+                                @endcan
+                                @can('followup_logs.edit')
                                 <a href="{{ route('admin.followups.edit', $log) }}" class="btn btn-sm btn-outline-primary">
                                     Edit
                                 </a>
+                                @endcan
+
+                                 @can('followup_logs.delete')
                                 <form action="{{ route('admin.followups.destroy', $log) }}" method="POST" class="d-inline"
                                     onsubmit="return confirm('Are you sure you want to delete this follow-up log?');">
                                     @csrf
@@ -47,6 +56,7 @@
                                         Delete
                                     </button>
                                 </form>
+                                @endcan
                             </td>
                         </tr>
                     @empty

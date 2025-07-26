@@ -36,25 +36,83 @@
 
     {{-- ───── Filter row ───── --}}
     <form method="get" class="row g-2 mb-3 align-items-center">
+        {{-- ───── Top action row (right aligned) ───── --}}
+        <div class="d-flex justify-content-end mb-3">
+            @can('customers.add')
+                <button type="button" class="btn btn--sm btn--primary me-2" data-bs-toggle="modal"
+                    data-bs-target="#customer-modal">
+                    @lang('Add Customer')
+                </button>
+            @endcan
+            <a href="{{ route('admin.customers.export', request()->query()) }}" class="btn btn--sm btn-outline--primary">
+                @lang('Export CSV/Excel')
+            </a>
+        </div>
+
+        {{-- Filter fields below --}}
         <div class="col-auto">
             <input name="q" value="{{ request('q') }}" class="form-control form-control-sm"
                 placeholder="@lang('Search…')">
         </div>
 
         <div class="col-auto">
-            <button class="btn btn--sm btn--primary">@lang('Filter')</button>
+            <select name="type" class="form-select form-select-sm">
+                <option value="">@lang('All Types')</option>
+                @foreach (\App\Http\Controllers\Admin\CustomerController::TYPES as $opt)
+                    <option value="{{ $opt }}" @selected(request('type') === $opt)>
+                        @lang($opt)
+                    </option>
+                @endforeach
+            </select>
         </div>
 
-        <div class="col-auto ms-auto">
-            <a href="{{ route('admin.customers.export') }}" class="btn btn--sm btn-outline--primary">
-                @lang('Export CSV/Excel')
-            </a>
-            <button type="button" class="btn btn--sm btn--primary ms-2" data-bs-toggle="modal"
-                data-bs-target="#customer-modal">
-                @lang('Add Customer')
-            </button>
+        <div class="col-auto">
+            <select id="f_division" name="division_id" class="form-select form-select-sm">
+                <option value="">@lang('All Divisions')</option>
+                @foreach ($bd['divisions'] as $d)
+                    <option value="{{ $d['id'] }}" @selected(request('division_id') == $d['id'])>{{ $d['name'] }}</option>
+                @endforeach
+            </select>
         </div>
+
+        <div class="col-auto">
+            <select id="f_district" name="district_id" class="form-select form-select-sm">
+                <option value="">@lang('All Districts')</option>
+                {{-- JS populates options --}}
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <select id="f_area" name="area_name" class="form-select form-select-sm">
+                <option value="">@lang('All Areas')</option>
+                {{-- JS populates options --}}
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <button class="btn btn--sm btn--primary">@lang('Filter')</button>
+            <a href="{{ route('admin.customers.index') }}" class="btn btn--sm btn--secondary ms-1">@lang('Reset')</a>
+        </div>
+
     </form>
+
+
+    @php
+        $hasDivision = request()->filled('division_id');
+        $hasDistrict = request()->filled('district_id');
+        $hasArea = request()->filled('area_name');
+
+        // Decide which word to show
+        $level = $hasArea ? __('area') : ($hasDistrict ? __('district') : __('division'));
+    @endphp
+
+    @if ($hasDivision || $hasDistrict || $hasArea)
+        <p class="text-muted mb-2">
+            {{ __('Customers in selected') }} {{ $level }} :
+            <strong>{{ $customers->total() }}</strong>
+        </p>
+    @endif
+
 
     {{-- ───── Table ───── --}}
     <div class="table-responsive--md table-responsive table-sm">
@@ -64,9 +122,11 @@
                     <th>@lang('Customer Id')</th>
                     <th>@lang('Customer Name')</th>
                     <th>@lang('Company Name')</th>
+                    <th>@lang('Customer Type')</th>
                     <th>@lang('Contact Number')</th>
                     <th>@lang('Email')</th>
                     <th>@lang('Address')</th>
+                    <th>Created By</th>
                     <th>@lang('Remarks')</th>
                     <th>@lang('Action')</th>
                 </tr>
@@ -77,6 +137,7 @@
                         <td style="align-content: center;">{{ $customer->id }}</td>
                         <td>{{ $customer->name }}</td>
                         <td>{{ $customer->company }}</td>
+                        <td>{{ $customer->customer_type }}</td>
                         <td>{{ $customer->contact_number }}</td>
                         <td>{{ $customer->email ?? '—' }}</td>
 
@@ -86,31 +147,38 @@
                             {{ $disName[$customer->district_id] ?? '-' }} &gt;
                             {{ is_numeric($customer->area_name) ? $upaName[$customer->area_name] ?? '-' : $customer->area_name }}
                         </td>
+                        <td>{{ $customer->creator?->name ?? '—' }}</td>
 
                         <td>{{ Str::limit($customer->remarks, 20) }}</td>
                         <td>
                             <div class="btn-group gap-2">
-                                {{-- Edit --}}
-                                <a href="{{ route('admin.customers.edit', $customer->id) }}"
-                                    class="btn btn--xs btn--primary">
-                                    <i class="la la-pencil"></i> @lang('Edit')
-                                </a>
+                                @can('customers.edit')
+                                    {{-- Edit --}}
+                                    <a href="{{ route('admin.customers.edit', $customer->id) }}"
+                                        class="btn btn--xs btn--primary">
+                                        <i class="la la-pencil"></i> @lang('Edit')
+                                    </a>
+                                @endcan
 
                                 {{-- View --}}
-                                <a href="{{ route('admin.customers.show', $customer->id) }}" class="btn btn--xs btn--info">
-                                    <i class="la la-eye"></i> @lang('View')
-                                </a>
+                                @can('customers.view')
+                                    <a href="{{ route('admin.customers.show', $customer->id) }}" class="btn btn--xs btn--info">
+                                        <i class="la la-eye"></i> @lang('View')
+                                    </a>
+                                @endcan
 
                                 {{-- Delete --}}
-                                <form class="d-inline" action="{{ route('admin.customers.destroy', $customer) }}"
-                                    method="POST" onsubmit="return confirm('@lang('Delete this record?')');">
-                                    @csrf
-                                    @method('delete')
-                                    <button class="btn btn--xs btn--danger">
-                                        <i class="la la-trash"></i> @lang('Delete')
-                                    </button>
-                                    <x-confirmation-modal />
-                                </form>
+                                @can('customers.delete')
+                                    <form class="d-inline" action="{{ route('admin.customers.destroy', $customer) }}"
+                                        method="POST" onsubmit="return confirm('@lang('Delete this record?')');">
+                                        @csrf
+                                        @method('delete')
+                                        <button class="btn btn--xs btn--danger">
+                                            <i class="la la-trash"></i> @lang('Delete')
+                                        </button>
+                                        <x-confirmation-modal />
+                                    </form>
+                                @endcan
                             </div>
                         </td>
 
@@ -156,6 +224,18 @@
                         <div class="mb-3">
                             <label class="form-label">@lang('Company Name')</label>
                             <input type="text" class="form-control" name="company" :value="edit?.company || ''">
+                        </div>
+
+                        {{-- Customer Type --}}
+                        <div class="mb-3">
+                            <label class="form-label">@lang('Customer Type')</label>
+                            <select name="customer_type" class="form-select form-select-sm" required
+                                {{-- ✓ pre‑select the current value when edit mode is active --}} x-bind:value="edit?.customer_type || ''">
+                                <option value="">— @lang('Select') —</option>
+                                <option value="Wholesale">@lang('Wholesale')</option>
+                                <option value="Project">@lang('Project')</option>
+                                <option value="Online">@lang('Online')</option>
+                            </select>
                         </div>
 
                         {{-- Contact --}}
@@ -247,9 +327,7 @@
 @endpush
 
 
-@push('breadcrumb-plugins')
-    <x-search-form />
-@endpush
+
 
 @push('script')
     <script>
@@ -403,6 +481,64 @@
                     }, 50);
                 }, 50);
             });
+            /* -----------------------------------------------------------------
+       A. populate district + area selects on page load
+    ----------------------------------------------------------------- */
+            (function initLocationFilters() {
+                const $fDiv = $('#f_division');
+                const $fDis = $('#f_district');
+                const $fArea = $('#f_area');
+
+                const option = (v, t) => `<option value="${v}">${t}</option>`;
+
+                // 1️⃣ build district list on division change
+                $fDiv.on('change', function() {
+                    const id = +this.value || 0;
+
+                    $fDis.html('<option value="">@lang('All Districts')</option>');
+                    $fArea.html('<option value="">@lang('All Areas')</option>');
+
+                    if (!id) return;
+
+                    BD_LOC.districts
+                        .filter(d => +d.division_id === id)
+                        .forEach(d => $fDis.append(option(d.id, d.name)));
+
+                    // keep previously‑selected district (if any)
+                    $fDis.val('{{ request('district_id') }}').trigger('change');
+                });
+
+                // 2️⃣ build area list on district change
+                $fDis.on('change', function() {
+                    const id = +this.value || 0;
+
+                    $fArea.html('<option value="">@lang('All Areas')</option>');
+                    if (!id) return;
+
+                    const areas = id === 1 ?
+                        BD_LOC.dhaka.map(a => ({
+                            value: a.name,
+                            name: a.name
+                        })) :
+                        BD_LOC.upazilas
+                        .filter(u => +u.district_id === id)
+                        .map(u => ({
+                            value: u.name,
+                            name: u.name
+                        }));
+
+                    areas.sort((a, b) => a.name.localeCompare(b.name))
+                        .forEach(a => $fArea.append(option(a.value, a.name)));
+
+                    // keep previously‑selected area (if any)
+                    $fArea.val('{{ request('area_name') }}');
+                });
+
+                // initialise on page load
+                if ('{{ request('division_id') }}') {
+                    $fDiv.trigger('change');
+                }
+            })();
         })(jQuery);
     </script>
     <script>

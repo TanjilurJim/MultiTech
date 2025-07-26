@@ -1,42 +1,61 @@
 @extends('admin.layouts.app')
+
 @section('panel')
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0 fw-semibold">
+        <i class="las la-user-shield me-1"></i> Roles
+    </h4>
+    <a href="{{ route('admin.roles.create') }}" class="btn btn-sm btn-primary">
+        <i class="las la-plus"></i> Add Role
+    </a>
+</div>
 
-
-    <h5 class="mb-3">Roles</h5>
-
-    <a href="{{ route('admin.roles.create') }}" class="btn btn-sm btn-primary mb-3">Add Role</a>
-
-    <table class="table table-bordered">
-        <thead>
-            <th>Name</th>
-            <th># Users</th>
-            <th># Perms</th>
-            <th>Actions</th>
-        </thead>
-        <tbody>
-            @foreach ($roles as $r)
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-light">
                 <tr>
-                    <td>{{ $r->name }}</td>
-                    <td>{{ $r->users_count }}</td>
-                    <td>{{ $r->permissions_count }}</td>
-                    <td>
-                        <a href="{{ route('admin.roles.edit', $r) }}" class="btn btn-sm btn-warning">Edit</a>
-                        @if ($r->name !== 'super-admin')
-                            <form action="{{ route('admin.roles.destroy', $r) }}" method="POST" class="d-inline">
-                                @csrf @method('DELETE')
-                                <button class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Del</button>
-                            </form>
-                        @endif
-                    </td>
+                    <th>Name</th>
+                    <th># Users</th>
+                    <th># Perms</th>
+                    <th class="text-end">Actions</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @forelse ($roles as $r)
+                    <tr>
+                        <td>{{ $r->name }}</td>
+                        <td>{{ $r->users_count }}</td>
+                        <td>{{ $r->permissions_count }}</td>
+                        <td class="text-end">
+                            <a href="{{ route('admin.roles.edit', $r) }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="las la-pen"></i>
+                            </a>
+                            @if ($r->name !== 'super-admin')
+                                <form action="{{ route('admin.roles.destroy', $r) }}" method="POST" class="d-inline">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this role?')">
+                                        <i class="las la-trash"></i>
+                                    </button>
+                                </form>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="text-center py-4">– No roles found –</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
-    {{ $roles->links() }}
+    @if ($roles->hasPages())
+        <div class="card-footer">
+            {{ $roles->links() }}
+        </div>
+    @endif
+</div>
 
-    <x-flash-toast />
+<x-flash-toast />
 @endsection
-@push('breadcrumb-plugins')
-    <x-search-form />
-@endpush

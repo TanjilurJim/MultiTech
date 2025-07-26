@@ -11,17 +11,26 @@ class CustomerExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $divisions;
     protected $districts;
-
-    public function __construct()
+    protected $admin;  
+    
+    public function __construct($admin)
     {
         $bd = getBangladeshLocationData();
         $this->divisions = collect($bd['divisions'])->pluck('name', 'id');
         $this->districts = collect($bd['districts'])->pluck('name', 'id');
+        $this->admin     = $admin;   // save for use in collection()
     }
+
+    // public function __construct()
+    // {
+    //     $bd = getBangladeshLocationData();
+    //     $this->divisions = collect($bd['divisions'])->pluck('name', 'id');
+    //     $this->districts = collect($bd['districts'])->pluck('name', 'id');
+    // }
 
     public function collection()
     {
-        return Customer::all();
+        return Customer::visibleTo($this->admin)->get();
     }
 
     public function headings(): array

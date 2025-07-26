@@ -14,6 +14,7 @@
         <div class="card-body">
             <h5 class="mb-3">{{ $customer->name }} 
                 <small class="text-muted">({{ $customer->company }})</small>
+                <small class="text-muted">({{ $customer->customer_type }})</small>
             </h5>
 
             <div class="row gy-3">

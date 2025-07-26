@@ -2,25 +2,58 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\HasAreaScope;
 
 class Customer extends Model
 {
-    //
+    /**
+     * Bring in the original scope from the trait *under a new name*.
+     * PHP lets you alias trait methods like this:
+     */
+    use HasAreaScope {
+        HasAreaScope::scopeVisibleTo as protected scopeApplyArea;   // ⬅️ alias
+    }
+
+
+
     protected $fillable = [
-        'name', 'company', 'contact_number', 'email',
-        'division_id', 'district_id', 'thana_id','area_name', 'postcode','remarks'
+        'name',
+        'company',
+        'contact_number',
+        'email',
+        'division_id',
+        'district_id',
+        'thana_id',
+        'area_name',
+        'postcode',
+        'remarks',
+        'customer_type',
+        'created_by',
     ];
 
-    /** Accessor for "Division > District > Thana" */
-    // public function getAddressAttribute(): string
-    // {
-    //     return "{$this->division->name} > {$this->district->name} > {$this->thana->name}";
-    // }
+    /**
+     * Master scope: combines
+     *   • super-admin bypass
+     *   • customers.view_all bypass
+     *   • otherwise the original area filter
+     */
+    public function scopeVisibleTo(Builder $query, $admin): Builder
+    {
+        if (
+            $admin->hasRole('super-admin') ||
+            $admin->can('customers.view_all')
+        ) {
+            return $query;               // show everything
+        }
 
-    // If you’ve got tables for divisions/districts/thanas already:
-    // public function division() { return $this->belongsTo(Division::class); }
-    // public function district() { return $this->belongsTo(District::class); }
-    // public function thana()    { return $this->belongsTo(Thana::class); }
+        // fall back to the trait’s area-based filter
+        return $this->scopeApplyArea($query, $admin);
+    }
 
+    public function creator()
+    {
+        return $this->belongsTo(\App\Models\Admin::class, 'created_by');
+    }
 }

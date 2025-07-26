@@ -32,6 +32,22 @@
                                 <input type="text" name="company" value="{{ old('company', $customer->company) }}"
                                     class="form-control">
                             </div>
+                            {{-- Customer Type --}}
+                            <div class="col-md-6">
+                                <label class="form-label">@lang('Customer Type')</label>
+                                <select name="customer_type" class="form-select" required>
+                                    <option value="">— @lang('Select') —</option>
+                                    <option value="Wholesale" @selected(old('customer_type', $customer->customer_type) === 'Wholesale')>
+                                        @lang('Wholesale')
+                                    </option>
+                                    <option value="Project" @selected(old('customer_type', $customer->customer_type) === 'Project')>
+                                        @lang('Project')
+                                    </option>
+                                    <option value="Online" @selected(old('customer_type', $customer->customer_type) === 'Online')>
+                                        @lang('Online')
+                                    </option>
+                                </select>
+                            </div>
                             <div class="col-md-6">
                                 <label class="form-label">@lang('Contact Number')</label>
                                 <input type="text" name="contact_number"
@@ -144,7 +160,7 @@
                 if (hits.length === 1) {
                     $postcode.replaceWith(
                         `<input type="text" id="postcode" name="postcode" class="form-control" value="${hits[0].postCode}" readonly>`
-                        );
+                    );
                 } else if (hits.length > 1) {
                     const $sel = $('<select id="postcode" name="postcode" class="form-select" required>');
                     $sel.append('<option value="">—</option>');
